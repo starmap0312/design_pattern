@@ -33,7 +33,8 @@ class EnginolaMMU(MMU):
         print 'EnginolaMMU created'
 
 class AbstractToolkit(object):
-    # abstract class for creating factory objects, having a static method for creating abstract
+    # abstract class for creating factory objects, having a static method for 
+    # creating abstract
     # factory objects based on parameters
     # single entry point for creating factory objects
 
