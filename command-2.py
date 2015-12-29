@@ -1,45 +1,55 @@
 # Command Pattern
-# - issue requests to objects without knowing about the operation being requested or
-#   the receiver of the request
-# - command encapsulates (wraps) in an object: an object, a method name, and some arguments
-# - create a class that encapsulates: 1. a "receiver" object, 2. the method to invoke
-#   3. the arguments to pass
+# - issue requests to objects' operations (in the invoker) without knowing about the requested
+#   operation or the receiver object
+# - a command object encapsulates (wraps): 
+#   a) a receiver object
+#   b) the receiver's operation to be invoked
+#   c) the arguments to be passed in
+
+# a simple example
 
 class Command(object):
+    ''' a uniform interface '''
 
     def execute(self):
         raise NotImplementedError
 
-class Politician(Command):
+class PoliticianCommand(Command):
+    ''' an implmentation of the interface '''
 
     def execute(self):
         print 'politician: take money from the rich'
 
-class Engineer(Command):
+class EngineerCommand(Command):
+    ''' an implmentation of the interface '''
 
     def execute(self):
         print 'engineer: take out the trash'
 
-class Programmer(Command):
+class ProgrammerCommand(Command):
+    ''' an implmentation of the interface '''
 
     def execute(self):
         print 'programmer: sell the bugs'
 
-class CommandQueue(object):
+class Invoker(object):
+    ''' the invoker class: knows how to use command objects but delegates the construction to
+        external code (i.e. the client)
+    '''
 
-    def produceRequests(self):
-        queue = []
-        queue.append(Engineer())
-        queue.append(Politician())
-        queue.append(Programmer())
-        return queue
+    def __init__(self):
+        self.queue = []
 
-    def runRequests(self, queue):
-        for command in queue:
+    def addCommand(self, cmd):
+        self.queue.append(cmd)
+
+    def runCommands(self):
+        for command in self.queue:
             command.execute()
 
-# client codes
-cmd_queue = CommandQueue()
-queue = cmd_queue.produceRequests()
-cmd_queue.runRequests(queue)
-
+# the client
+invoker = Invoker()
+invoker.addCommand(EngineerCommand())
+invoker.addCommand(PoliticianCommand())
+invoker.addCommand(ProgrammerCommand())
+invoker.runCommands()

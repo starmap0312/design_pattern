@@ -1,97 +1,118 @@
 # Iterator Pattern
-# object pattern: relationships between objects are established at run time via composition
-# behavior pattern: how classes and objects interact and distribute responsibilities
+# - provide a way to access the elements of an aggregate object (container) sequentially, 
+#   without exposing its internal data structure (representation)
+#   a) decouple iteration of a collection from its data structure
+#   b) provide a uniform interface for traversal: next() and hasNext() methods
+#   c) take the responsibility of traversal out of the aggregate object
+#
+#                             (HAS_A)
+#          Iterator ...........................> Aggregate
+#             ^                uses                  ^
+#             |                                      |
+#             |                  (HAS_A)             |
+#       ConcreteIterator <.................... ConcreteAggregate
+#                        creates via injection
+#
+#   (the iterator pattern applies dependency injection pattern, where the iterator object
+#    takes the aggregate object when constructed and uses it to iterate its elements)
+#
+# - iterator pattern vs. visitor pattern:
+#   a) iterator can traverse a composite
+#   b) visitor can apply an operation over a composite
+# - examples of similar frameworks that separate algorithms from the data structure:
+#   ex. support four data structures (array, binary tree, linked list, and hash table), and 
+#       support three algorithms (sort, find, and merge)
+#   a) the naive approach requires 4 x 3 developments
+#   b) generic programming requires 4 + 3 configuration items
 
-class MenuItem(object):
-    # items
-
-    def __init__(self, name, price, description):
-        self.name = name
-        self.price = price
-        self.description = description
-
-    def getName(self):
-        return self.name
-
-    def getPrice(self):
-        return self.price
-
-    def getDescription(self):
-        return self.description
-
-class Iterator(object):
-    # iterator interface
-
-    def hasNext(self):
-        raise NotImplementedError
-
-    def next(self):
-        raise NotImplementedError
-
-class DinerMenuIterator(Iterator):
-    # an iterator over items
-
-    def __init__(self, items):
-        self.position = 0
-        self.items = items
-
-    def hasNext(self):
-        if self.position >= len(self.items) or self.items[self.position] is None:
-            return False
-        return True
-
-    def next(self):
-        item = self.items[self.position]
-        self.position += 1
-        return item
-
-class Menu(object):
-    # an aggregate interface that can create an iterator for its items
-
+class Aggregate(object):
+    ''' the aggregate interface with a createIterator() method
+        i.e. the interface of the data structure (different types implemented in subclasses)
+    '''
     def createIterator(self):
         raise NotImplementedError
 
-class DinerMenu(Menu):
-    # an implementaion of aggregate interface
-
-    MAX_ITEMS = 3
+class ConcreteAggregate(Aggregate):
+    ''' an implementation of the aggregate having a group of items to be iterated
+        the data structure and a concrete iterator is specified
+    '''
 
     def __init__(self):
-        self.numberOfItems = 0
-        self.menuItems = []
-        self.addItem('Pancake', 2.99, 'pancake with eggs and toast')
-        self.addItem('Waffles', 3.12, 'waffles with blueberries')
-        self.addItem('Waffles A', 4.12, 'waffles with blueberries')
-        self.addItem('Waffles B', 5.12, 'waffles with blueberries')
+        self.items = []
 
     def createIterator(self):
-        return DinerMenuIterator(self.menuItems)
+        # create a concrete iterator by injection 
+        return ConcreteIterator(self)
 
-    def addItem(self, name, price, description):
-        if self.numberOfItems >= DinerMenu.MAX_ITEMS:
-            print 'Menu is full!'
-        else:
-            self.menuItems.append(MenuItem(name, price, description))
-            self.numberOfItems += 1
+    @property
+    def count(self):
+        return len(self.items)
 
-class Waitress(object):
-    # aggregates of items, able to create iterators for item traversal
+    def get(self, index):
+        return self.items[index]
 
-    def __init__(self, dinerMenu):
-        self.dinerMenu = dinerMenu
+    def add(self, value):
+        self.items.append(value)
 
-    def printMenu(self):
-        iterator = self.dinerMenu.createIterator()
-        self.printIterator(iterator)
+class Iterator(object):
+    ''' the iterator interface defining how to use an aggregate object
+        in the case of iterator, this is a uniform interface with next() and hasNext() methods
+    '''
 
-    def printIterator(self, iterator):
-        # can print out any iterators
-        while iterator.hasNext():
-            menuItem = iterator.next()
-            print menuItem.getName()
-            print menuItem.getPrice()
-            print menuItem.getDescription()
+    def first(self):
+        raise NotImplementedError
 
-dinerMenu = DinerMenu()
-waitress = Waitress(dinerMenu)
-waitress.printMenu()
+    def next(self):
+        raise NotImplementedError
+
+    def hasNext(self):
+        raise NotImplementedError
+
+    def current(self):
+        raise NotImplementedError
+
+class ConcreteIterator(Iterator):
+    ''' a concrete iterator implementing how to use an aggregate object '''
+
+    def __init__(self, aggregate):
+        # dependency injection: an aggregate object is injected via constructor
+        # i.e. the construction of the aggregate object is delegated to external code
+        #      the iterator object can be constructed only if the aggregate object is specified
+        self.current = 0
+        self.aggregate = aggregate
+
+    def first(self):
+        return self.aggregate.get(0)
+
+    def next(self):
+        # use of the aggregate object, giving the next element of the aggregate object
+        if self.current < self.aggregate.count - 1:
+            self.current += 1
+            return self.aggregate.get(self.current)
+        return None
+
+    def hasNext(self):
+        # use of the aggregate object, returning if there exists more element
+        return True if self.current <= self.aggregate.count else False
+
+    def current(self):
+        return self.aggregate.get(self.current)
+
+# construct the aggregate object
+aggregate = ConcreteAggregate()
+aggregate.add('Item A')
+aggregate.add('Item B')
+aggregate.add('Item C')
+aggregate.add('Item D')
+# two ways to construct the iterator object
+# a) inject the aggregate object when constructing the iterator object
+iterator = ConcreteIterator(aggregate)
+# b) use the createIterator() of the iterator object
+iterator = aggregate.createIterator()
+
+# use of the iterator object
+item = iterator.first()
+while item is not None:
+    print item
+    item = iterator.next()
+

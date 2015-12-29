@@ -1,87 +1,94 @@
 # Iterator Pattern
-# - provide a way to access the elements of an aggregate object sequentially, without
-#   exposing its underlying representation
-# - decouple algorithms of a collection from its data structure
-# - gives you a way to access the elements of an aggregate object without exposing its
-#   internal structure
-# - providing a uniform interface for traversing many types of aggregate objects
-# - to traverse the elements of an aggregate object in different ways without bloat its interface
-# - take the responsibility for traversal out of an aggregate object, put into a standard protocol
-# - generic programming: separate the notion of "algorithm" from that of "data structure"
-# - support 4 data structures(array/binary tree/linked list/hash table), and 3 algorithms(sort/
-#   find/merg), the naive approach requires 4x3 developments, whereas generic programming
-#   requires 4+3 configuration items
-# - iterator can traverse a composite, and visitor can apply an operation over a composite
+# object pattern: relationships between objects are established at run time via composition
+# behavior pattern: how classes and objects interact and distribute responsibilities
 
-class Aggregate(object):
-    # aggregate abstraction
+class MenuItem(object):
+    ''' the element class of the aggregate '''
 
-    def createIterator(self):
-        raise NotImplementedError
+    def __init__(self, name, price, description):
+        self.name = name
+        self.price = price
+        self.description = description
 
-class ConcreteAggregate(Aggregate):
+    def getName(self):
+        return self.name
 
-    def __init__(self):
-        self.items = []
+    def getPrice(self):
+        return self.price
 
-    def createIterator(self):
-        return ConcreteIterator(self)
-
-    @property
-    def count(self):
-        return len(self.items)
-
-    def get(self, index):
-        return self.items[index]
-
-    def set(self, value):
-        self.items.append(value)
+    def getDescription(self):
+        return self.description
 
 class Iterator(object):
-    # iterator abstraction
+    ''' the iterator interface with hasNext() and next() methods '''
 
-    def first(self):
+    def hasNext(self):
         raise NotImplementedError
 
     def next(self):
         raise NotImplementedError
 
+class DinerMenuIterator(Iterator):
+    ''' an implementation of the iterator '''
+
+    def __init__(self, items):
+        self.position = 0
+        self.items = items
+
     def hasNext(self):
-        raise NotImplementedError
-
-    def current(self):
-        raise NotImplementedError
-
-class ConcreteIterator(Iterator):
-
-    def __init__(self, aggregate):
-        self.current = 0
-        self.aggregate = aggregate
-
-    def first(self):
-        return self.aggregate.get(0)
+        if self.position >= len(self.items) or self.items[self.position] is None:
+            return False
+        return True
 
     def next(self):
-        if self.current < self.aggregate.count-1:
-            self.current += 1
-            return self.aggregate.get(self.current)
-        return None
+        item = self.items[self.position]
+        self.position += 1
+        return item
 
-    def hasNext(self):
-        return True if self.current <= self.aggregate.count else False
+class Menu(object):
+    ''' the aggregate interface with createIterator() method '''
 
-    def current(self):
-        return self.aggregate.get(self.current)
+    def createIterator(self):
+        raise NotImplementedError
 
-aggregate = ConcreteAggregate()
-aggregate.set('Item A')
-aggregate.set('Item B')
-aggregate.set('Item C')
-aggregate.set('Item D')
-iterator = ConcreteIterator(aggregate)
-item = iterator.first()
-while item is not None:
-    print item
-    item = iterator.next()
+class DinerMenu(Menu):
+    ''' an implementaion of the aggregate interface '''
 
+    MAX_ITEMS = 3
 
+    def __init__(self):
+        self.numberOfItems = 0
+        self.menuItems = []
+
+    def createIterator(self):
+        return DinerMenuIterator(self.menuItems)
+
+    def addItem(self, name, price, description):
+        if self.numberOfItems >= DinerMenu.MAX_ITEMS:
+            print 'Menu is full!'
+        else:
+            self.menuItems.append(MenuItem(name, price, description))
+            self.numberOfItems += 1
+
+class Waitress(object):
+    ''' the client of the iterator '''
+
+    def __init__(self, dinerMenu):
+        self.dinerMenu = dinerMenu
+
+    def printMenu(self):
+        # use the iterator to print out all elements of the aggregate object
+        iterator = self.dinerMenu.createIterator()
+        while iterator.hasNext():
+            menuItem = iterator.next()
+            print menuItem.getName()
+            print menuItem.getPrice()
+            print menuItem.getDescription()
+
+dinerMenu = DinerMenu()
+dinerMenu.addItem('Pancake', 2.99, 'pancake with eggs and toast')
+dinerMenu.addItem('Waffles', 3.12, 'waffles with blueberries')
+dinerMenu.addItem('Waffles A', 4.12, 'waffles with blueberries')
+dinerMenu.addItem('Waffles B', 5.12, 'waffles with blueberries')
+waitress = Waitress(dinerMenu)
+waitress.printMenu()

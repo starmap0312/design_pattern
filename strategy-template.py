@@ -1,12 +1,15 @@
+# Strategy Pattern
+#
+# example: strategy pattern with template methods
+
 class Strategy(object):
-    # 1. define the interface of the algorithm
+    ''' an interface of the algorithm objects '''
 
     def solve(self):
         raise NotImplementedError
 
 class TemplateMethod1(Strategy):
-    # 2. bury implementation: defer implementation to subclasses
-    # 3. template method
+    ''' a subclass of the interface with template methods '''
 
     def solve(self):
         self.start()
@@ -26,29 +29,32 @@ class TemplateMethod1(Strategy):
     def stop(self):
         raise NotImplementedError
 
-class Implementation1(TemplateMethod1):
+class Impl1(TemplateMethod1):
+    ''' an implementation of the subclass '''
 
     def __init__(self):
         self.state = 1
 
     def start(self):
-        print 'start '
+        print 'start  '
 
     def nextTry(self):
-        print 'nextTry-%s  ' % self.state
+        print 'nextTry  %s' % self.state
         self.state += 1
         return True
 
     def isSolution(self):
-        print 'isSolution-%s  ' % (self.state == 3)
-        return (self.state == 3)
+        print 'isSolution %s' % (self.state == 3)
+        return self.state == 3
 
     def stop(self):
         print 'stop  '
 
 class TemplateMethod2(Strategy):
-    # 2. bury implementation
-    # 3. template method
+    ''' a subclass of the interface with template methods '''
+
+    def __init__(self):
+        self.state = 1
 
     def solve(self):
         while True:
@@ -58,33 +64,31 @@ class TemplateMethod2(Strategy):
             self.postProcess()
 
     def preProcess(self):
-        raise NotImplementedError 
-
-    def search(self):
-        raise NotImplementedError 
+        raise NotImplementedError
 
     def postProcess(self):
-        raise NotImplementedError 
+        raise NotImplementedError
 
-class Implementation2(TemplateMethod2):
+    def search(self):
+        raise NotImplementedError
 
-    def __init__(self):
-        self.state = 1
+class Impl2(TemplateMethod2):
+    ''' an implementation of the subclass '''
 
     def preProcess(self):
         print 'preProcess  '
 
-    def search(self):
-        print 'search-%s  ' % self.state
-        self.state += 1
-        return True if self.state == 3 else False
-
     def postProcess(self):
         print 'postProcess  '
 
-# 4. clients couple strictly to the interface
+    def search(self):
+        print 'search  %s' % self.state
+        self.state += 1
+        return self.state == 3
 
-algorithm = Implementation1()
-algorithm.solve()
-algorithm2 = Implementation2()
+# the client creates the implementation object but calls the superclass' template method
+# the coupling can be minimized if the construction of the object is separated, ex. by injection
+algorithm1 = Impl1()
+algorithm1.solve()
+algorithm2 = Impl2()
 algorithm2.solve()

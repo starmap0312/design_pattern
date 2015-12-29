@@ -1,32 +1,47 @@
 # Factory Method
-# creational pattern: provides a way to decouple a client from the objects it creates
+# creational pattern
 # class pattern: relationships between classes are established at compile time
-# - an interface for creating objects, but let subclasses decide which to instantiate
-# - superclass specifies generic behaviors and delegates the creation details to subclasses
+# - encapsulate object creation in one method
+# - the superclass (interface) defines a method for creating objects, but let subclasses decide
+#   which implementation of the objects to be instantiated
+# - factory method is not necessary when instances never change
+# - the factory method is often used with the template pattern:
+#   a) superclass specifies generic the uses of the object and delegates the creation details to 
+#      the subclasses
+#   b) the superclass does not directly depend on the created objects, i.e. the superclass and 
+#      the created objects are "loosely coupled"
+#   c) factory method is called within template methods of the superclass, and therefore the
+#      client of the created objects is the superclass
+#
+#                                (HAS_A)
+#       Client .....................................> Service
+#          ^                                             ^
+#          | (IS_A)  constructs via factory method       | (IS_A)
+#    ClientExample .................................> ServiceExample
+#
+# - factory method is similar to abstract factory without emphasis on families
 # - often, design starts out using factory method, and evolve toward abstract factory,
 #   prototype, or builder patterns, in order to achieve more flexibility
-# - factory method -> creating objects vs. template method -> implementing an algorithm
-# - factory method is not necessary when instances never change
-# - factory method is similar to abstract factory without emphasis on families
-# - an increasingly popular defintion of factory method is to declared it as static method in
-#   the superclass, and it creates an instance of a subclass based on polymorphic creation (the 
-#   parameter of the method),
-#   it has the advantage of reusing existing objects, and can have more descriptive names, but
-#   the disadvantage is that when a new type is added, you have to modify the static method
-# - factory methods are usually called within template methods
-# - factory methods encapsulate object creation and allows an object to be requested without
-#   inextricable coupling to the act of creation
+# - factory method vs. template method:
+#   factory method: creating objects (construction of objects)
+#   template method: implementing an application (a template use of objects)
+# - one can also use a "simple factory" to create objects, i.e. define a (static) method that 
+#   takes a parameter of type and returns different objects based on the parameter 
+#   (advantage: the creation of objects is parameterized, the client depends on a type parameter
+#    and could have more descriptive names)
+#   (disadvantage: when a new object type is added, the (static) method needs to be modified)
 
 class PizzaStore(object):
-    # factory method: a specialization of template method, product creation defers to subclasses
-    # and an operation on the product is invariant and defined in superclass
+    ''' a superclass with factory and template methods '''
+    # factory method: object creation defers to subclasses (i.e. via subclassing)
+    # template method: generic use of the created object is invariant
 
     def createPizza(self, a_type):
-        # factory method that create products and is implemented in subclasses
+        # factory method: specific implementation is defined in subclasses
         raise NotImplementedError
 
     def orderPizza(self, a_type):
-        # an operation on products
+        # tempalte method: generic operations on the created objects
         pizza = self.createPizza(a_type)
         assert pizza is not None
         pizza.prepare()
@@ -36,9 +51,11 @@ class PizzaStore(object):
         return pizza
 
 class NYPizzaStore(PizzaStore):
+    ''' a subclass with an implemented factory method '''
 
     def createPizza(self, a_type):
-
+        # a specific implementation of the factory method
+        # a simple factory that returns different types of objects based on the parameter
         ingredientFactory = NYPizzaIngredientFactory()
 
         pizza = None
@@ -52,9 +69,10 @@ class NYPizzaStore(PizzaStore):
 
 
 class ChicagoPizzaStore(PizzaStore):
+    ''' a subclass with an implemented factory method '''
 
     def createPizza(self, a_type):
-
+        # a specific implementation of the factory method
         ingredientFactory = ChicagoPizzaIngredientFactory()
 
         pizza = None
@@ -67,50 +85,62 @@ class ChicagoPizzaStore(PizzaStore):
         return pizza
 
 class Pizza(object):
+    ''' a client inteface showing how to use the ingredient object, which is created by
+        a passed-in ingredient factory '''
 
     def prepare(self):
         raise NotImplementedError
 
     def bake(self):
+        # use of the ingredient object
         print 'baking %s' % self.name
 
     def cut(self):
+        # use of the ingredient object
         print 'cutting %s' % self.name
 
     def box(self):
+        # use of the ingredient object
         print 'boxing %s' % self.name
 
     def setName(self, name):
         self.name = name
 
 class CheesePizza(Pizza):
+    ''' a client implementation '''
 
     def __init__(self, ingredientFactory):
+        # an ingredient factory is injected via its constructor
         self.ingredientFactory = ingredientFactory
 
     def prepare(self):
+        # construction of the ingredient object
         self.cheese = self.ingredientFactory.createCheese()
         self.veggie = None
 
 class VeggiePizza(Pizza):
+    ''' a client implementation '''
 
     def __init__(self, ingredientFactory):
+        # an ingredient factory is injected via its constructor
         self.ingredientFactory = ingredientFactory
 
     def prepare(self):
+        # construction of the ingredient object
         self.cheese = None
         self.veggie = self.ingredientFactory.createVeggie()
 
 # Abstract Factory
 # creational pattern: provides a way to decouple a client and the objects it creates
 # object pattern: relationships between classes are established at run time via composition
-# - the client retire all references to 'new', and use the factory method of the factory
-#   object to create products instead
 # - decouples the client from the object it creates, insulating the client code from changes
-# - adding new concrete types is done by modifying the client code to use a different factory,
-#   which is typically one line in a file
+#   i.e. adding new concrete types is done by modifying the client code to use a different
+#        abstract factory implementation
 
 class PizzaIngredientFactory(object):
+    ''' an abstract factory for a family of ingredient objects
+        object creation defers to subclasses (i.e. via subclassing)
+    '''
 
     def createCheese(self):
         raise NotImplementedError
@@ -119,6 +149,7 @@ class PizzaIngredientFactory(object):
         raise NotImplementedError
 
 class NYPizzaIngredientFactory(PizzaIngredientFactory):
+    ''' an implementation of the abstract factory '''
 
     def createCheese(self):
         return ReggianoCheese()
@@ -127,6 +158,7 @@ class NYPizzaIngredientFactory(PizzaIngredientFactory):
         return GarlicVeggie()
 
 class ChicagoPizzaIngredientFactory(PizzaIngredientFactory):
+    ''' an implementation of the abstract factory '''
 
     def createCheese(self):
         return MozzarellaCheese()

@@ -1,86 +1,72 @@
 # Decorator Pattern
-# object pattern: relationships between objects are established at run time via composition
-# structural pattern: composes classes or objects into larger structures
-# - attach additional responsibilities to an object "dynamically" (wraps object at run time)
-# - provide a flexible alternative to subclassing for extending functionality
-# - both the decorator objects and the original object inherit the same base interface
-# - the decorator class declares a composition relationship to the base interface
-#   with a data member initialized in its constructor
-# - adapter provides a different interface to its subject, proxy provides the same interface,
-#   decorator provides an enhanced interface
-# - decorator is more transparent to the client than adapter, supporting recursive composition
-# - composite and decorator have similar structure diagram, both rely on recursive composition
-#   to organize an open-ended number of objects
-#   decorator: single child, composite: a list of children (internal nodes: decorator objects, 
-#   leaves: core objects)
-# - decorator can be viewed s a degenerate composite with single child. 
-#   decorator adds additional responsibilities, not intended for object aggregation(composite)
-# - decorator and proxy have similar structures but different purposes, both describe how
-#   to provide a level of indirection to another object by keeping a reference to the object
-#   to which they forward requests
+# - adapter pattern vs. decorator pattern:
+#   (both applying the dependency inversion principle: adding an abstraction layer)
+#
+#   adapter pattern:
+#
+#            Target Interface
+#                   ^
+#            (IS_A) |     (HAS_A)             (IS_A) 
+#                Adapter ........> "Adaptee" <------- AdapteeExample
+#                                "abstraction"
+#
+#     (Adapter & AdapteeExample both depend on an abstraction, making them "loosely coupled")
+#
+#   decorator pattern:
+#
+#                         "abstraction"
+#                   --> "Common Interface" <-----
+#                   |             ^             |
+#            (IS_A) |     (HAS_A) |             | (IS_A) 
+#                Decorater ........         Decoratee
+#                   ^
+#            (IS_A) |
+#            DecoraterExample
+#
+#     (Decorater & Decoratee both depend on an abstraction, making them "loosely coupled")
+#
 
-class Beverage(object):
-    # common interface
+# 1. create a "lowest common denominator" (common interface), making classes interchangeable
+class Widget(object):
 
-    def __init__(self):
-        self.description = 'Unknown Beverage'
-
-    def getDescription(self):
-        return self.description
-
-    def cost(self):
+    def draw(self):
         raise NotImplementedError
 
-class CondimentDecorator(Beverage):
-    # decorator interface
+# 3. core class IS_A common interface
+class TextField(Widget):
+    # core object
 
-    def getDescription(self):
-        raise NotImplementedError
+    def __init__(self, w, h):
+        self.width = w
+        self.height = h
 
-class Expresso(Beverage):
-    # concrete implementation, core
+    def draw(self):
+        print 'TextField: %s x %s' % (self.width, self.height)
 
-    def __init__(self):
-        self.description = 'Expresso'
+# 2. create a decorator base class also IS_A common interface
+class Decorator(Widget):
 
-    def cost(self):
-        return 1.99
+    def __init__(self, widget):
+        # 4. decorator class HAS_A instance of the common interface (core object)
+        self.widget = widget
 
-class HouseBlend(Beverage):
-    # concrete implementation, core
+    # 5. decorator delegates to the HAS_A object (core object)
+    def draw(self):
+        self.widget.draw()
 
-    def __init__(self):
-        self.description = 'House Blend Coffee'
+# 6. create a decorator derived classes for optional embellishment
+class BorderDecorator(Decorator):
 
-    def cost(self):
-        return 0.89
+    def draw(self):
+        self.widget.draw()
+        print 'BorderDecorator'
 
-class Mocha(CondimentDecorator):
-    # decorator implementation
+class ScrollDecorator(Decorator):
 
-    def __init__(self, beverage):
-        self.beverage = beverage
+    def draw(self):
+        self.widget.draw()
+        print 'ScrollDecorator'
 
-    def getDescription(self):
-        return self.beverage.getDescription() + ', Mocha'
-
-    def cost(self):
-        return self.beverage.cost() + 0.2
-
-
-class Soy(CondimentDecorator):
-    # decorator implementation
-
-    def __init__(self, beverage):
-        self.beverage = beverage
-
-    def getDescription(self):
-        return self.beverage.getDescription() + ', Soy'
-
-    def cost(self):
-        return self.beverage.cost() + 0.4
-
-beverage = Soy(Mocha(Expresso()))
-print beverage.getDescription(), '$%s' % beverage.cost()
-beverage2 = Soy(Soy(Mocha(HouseBlend())))
-print beverage2.getDescription(), '$%s' % beverage2.cost()
+# 8. client has the responsibility to compose desired configurations
+widget = BorderDecorator(BorderDecorator(ScrollDecorator(TextField(80, 24))))
+widget.draw()

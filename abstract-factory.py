@@ -1,4 +1,13 @@
 # Abstract Factory Pattern
+#
+#             AbstractFactory
+#              ^          ^
+#       (IS_A) |          | (IS_A)                (HAS_A)                        (IS_A)
+#  FactoryExample1 ...  FactoryExample2 .......................> Service1Example ------> Service1
+#                |....                |........................> Service2Example ------> Service2
+#                                     construct via factory method
+#
+#  (use the implementation of the abstract factory to create a family of related objects)
 
 class CPU(object):
     # abstract class of productA
@@ -33,15 +42,16 @@ class EnginolaMMU(MMU):
         print 'EnginolaMMU created'
 
 class AbstractToolkit(object):
-    # abstract class for creating factory objects, having a static method for 
-    # creating abstract
-    # factory objects based on parameters
-    # single entry point for creating factory objects
+    ''' an interface for creating a family of objects
+        in this example, a static method is defined, using which one can get specific
+        implmentation of the abstract factory by passing in a type parameter
+    '''
 
     (EMBER, ENGINOLA) = (1, 2)
 
     @staticmethod
     def getFactory(architecture):
+        # a simple factory: a static method that creates objects based on its parameters
         if architecture == AbstractToolkit.EMBER:
             return EmberToolkit()
         elif architecture == AbstractToolkit.ENGINOLA:
@@ -54,7 +64,7 @@ class AbstractToolkit(object):
         raise NotImplementedError
 
 class EmberToolkit(AbstractToolkit):
-    # abstract factory implementation
+    # abstract factory implementation: a family of realted objects
 
     def createCPU(self):
         return EmberCPU()
@@ -63,7 +73,7 @@ class EmberToolkit(AbstractToolkit):
         return EmberMMU()
 
 class EnginolaToolkit(AbstractToolkit):
-    # abstract factory implementation
+    # abstract factory implementation: a family of related objects
 
     def createCPU(self):
         return EnginolaCPU()
@@ -71,7 +81,7 @@ class EnginolaToolkit(AbstractToolkit):
     def createMMU(self):
         return EnginolaMMU()
 
-# the client codes
+# the client depends on the abstract factory and the parameter is passes to the static method
 abstractFactory = AbstractToolkit.getFactory(AbstractToolkit.EMBER)
 cpu = abstractFactory.createCPU()
 mmu = abstractFactory.createMMU()

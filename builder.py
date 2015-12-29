@@ -1,15 +1,19 @@
 # Builder Pattern
-# - when the constructor contains too many parameters, consider use a builder to
-#   build the product incrementally
-# - separate the construction of a complex object from its representation so that the same
-#   construction process can create different representations
 # - unlike creational pattern that constructs products in one shot, the builder pattern constructs
-#   the product step by step under the control of the director
+#   the product step by step
+# - when the constructor of a product contains too many parameters, consider use a builder
+#   to build the product incrementally
+#
+#             Builder Interface (buildParts() & getProduct() methods) 
+#                     ^
+#                     | (IS_A)   (HAS_A)
+#               BuilderExample  ........> Product (a complex products with many parts to build)
+#
+#   (BuilderExample implements buildParts() methods defined in the Builder Interface)
+#
 
 class Car(object):
-    # the product
-    # when an object is too complicated to construct by one constructor with many parameters
-    # it can be constructed part by part by a builder
+    ''' a complex product to be built '''
 
     def __init__(self):
         self.numSeats = None
@@ -26,61 +30,64 @@ class Car(object):
             )
 
 class AbstractCarBuilder(object):
-    # a builder interface
+    ''' a builder interface defining build-parts methods '''
 
-    def getResult(self):
+    def getProduct(self):
+        # a factory method to get the final result of the built product
         raise NotImplementedError
 
-    def setSeats(self, number):
+    def buildSeats(self, number):
         raise NotImplementedError
 
-    def setCityCar(self):
+    def buildCityCar(self):
         raise NotImplementedError
 
-    def setSportsCar(self):
+    def buildSportsCar(self):
         raise NotImplementedError
 
-    def setTripComputer(self):
+    def buildTripComputer(self):
         raise NotImplementedError
 
-    def setGPS(self):
+    def buildGPS(self):
         raise NotImplementedError
 
     def unsetGPS(self):
         raise NotImplementedError
 
 class CarBuilder(AbstractCarBuilder):
-    # a builder implementation 
+    ''' an implementation of the builder '''
 
     def __init__(self):
         self.car = Car()
 
-    def getResult(self):
+    def getProduct(self):
         return self.car
 
-    def setSeats(self, number):
+    def buildSeats(self, number):
         self.car.numSeats = number
 
-    def setCityCar(self):
+    def buildCityCar(self):
         self.car.carType = 'city car'
 
-    def setSportsCar(self):
+    def buildSportsCar(self):
         self.car.carType = 'sports car'
 
-    def setTripComputer(self):
+    def buildTripComputer(self):
         self.car.hasTripComputer = True
 
-    def setGPS(self):
+    def buildGPS(self):
         self.car.setGPS = True
 
     def unsetGPS(self):
         self.car.setGPS = False
 
-# the client build the object part by part and get the result in the end
+# use the concrete builder to construct the complex product
 carBuilder = CarBuilder()
-carBuilder.setSeats(2)
-carBuilder.setSportsCar()
-carBuilder.setTripComputer()
+carBuilder.buildSeats(2)
+carBuilder.buildSportsCar()
+carBuilder.buildTripComputer()
 carBuilder.unsetGPS()
-car = carBuilder.getResult()
-car.show()
+# the above steps are fixed, so one can consider to put them in a template method of the builder
+# or in an aditional class, i.e. Director, that uses the builder object
+car = carBuilder.getProduct() # get the final result of the built product
+car.show() # use of the product

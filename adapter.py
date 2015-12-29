@@ -24,6 +24,7 @@ class MallardDuck(Duck):
         print "I'm flying."
 
 class Turkey(object):
+    # an abstraction class
 
     def gobble(self):
         raise NotImplementedError
@@ -40,7 +41,7 @@ class WildTurkey(Turkey):
     def fly(self):
         print "I'm flying a short distance"
 
-class TurkeyAdapter(Duck):
+class TurkeyToDuckAdapter(Duck):
     # an adapter of turkey to duck
 
     def __init__(self, turkey):
@@ -53,6 +54,6 @@ class TurkeyAdapter(Duck):
         for i in range(5):
             self.turkey.fly()
 
-turkeyAdapter = TurkeyAdapter(WildTurkey())
+turkeyAdapter = TurkeyToDuckAdapter(WildTurkey())
 turkeyAdapter.quack()
 turkeyAdapter.fly()

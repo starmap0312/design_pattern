@@ -2,22 +2,11 @@
 # - a unified interface to a set of interfaces in a subsystem, a higher-level interface
 #   that makes the subsystem easier to use
 # - decouples the subsystem from its clients
-# - facade defines a new interface, whereas adapter makes two existing interfaces work together
-# - both mediator and facade abstracts functionality of existing classes; mediator abstracts/
-#   centralizes arbitrary communications between colleague objects; facade defines a simpler
-#   interface to a subsystem
-# - mediator routinely "adds value" and is known/referenced by the colleague objects; in contrast,
-#   facade does not add new functionality and is not known by the subsystem classes
-# - abstract factory can be used as an alternative to facade to "hide platform-specific classes"
-# - facade and adapter are different kinds of wrappers: the intent of facade is to produce a 
-#   simpler interface, whereas the intent of adapter is to design to an existing interface
-# - although facade often wraps multiple objects and adapter wraps a single object,
-#   facade could front-end a single complex object and adapter could wrap several legacy objects
 # - facade objects are often singletons because only one facade object is required
 
 # 1. identify the desired unified interface for a set of subsystems
 class PointCarte(object):
-    # a subsystem
+    ''' a subsystem '''
 
     def __init__(self, x, y):
         self.x = x
@@ -37,7 +26,7 @@ class PointCarte(object):
         return self.y
 
 class PointPolar(object):
-    # another subsystem
+    ''' a subsystem '''
 
     def __init__(self, radius, angle):
         self.radius = radius
@@ -51,7 +40,9 @@ class PointPolar(object):
         return '[%s@%s]' % (self.radius, self.angle)
 
 class Point(object):
-    # a desired, unified interface with move & rotate methods
+    ''' the facade class: a unified interface with move & rotate methods for the client to
+        use the subsystems
+    '''
 
     def __init__(self, x, y):
         self.pc = PointCarte(x, y)
@@ -72,6 +63,7 @@ class Point(object):
         print '  PointPolar is %s' % pp
 
 class Line(object):
+    ''' a client of the facade class '''
 
     def __init__(self, ori, end):
         self.o = ori
