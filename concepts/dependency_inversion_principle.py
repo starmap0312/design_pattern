@@ -1,23 +1,25 @@
 # Dependency Inversion Principle
-#   a way to decouple classes (objects): the principle inverts the way people think of dependency
+# - a way to decouple classes (objects): inverts the way people think of dependency
 #   conventional:
 #                       (HAS_A)
 #   high-level objects ........> low-level objects
 #
-#   dependency inversion principle: (i.e program to an interface, not an implementation)
+#   dependency inversion principle: (i.e. program to an interface, not an implementation)
 #
 #           .....> abstraction class <----
 #   (HAS_A) |                            | (IS_A)
+#           |                            |
 #   high-level objects           low-level objects
 #
-#   a) high-level modules do not depend on low-level modules. both should depend on the same
-#      "abstraction"
-#   b) abstractions do not depend on details. details should depend on abstractions
+#   a) high-level modules do not depend on low-level modules
+#      both should depend on the same "abstraction"
+#   b) abstractions do not depend on details
+#      details should depend on abstractions
 #
 # - classical examples:
-#   1) dependency injection pattern:
-#     the construction and use of a service objects are separated in Injector and Client classes
-#     respectively (add an abstraction class: Service)
+#   1) dependency injection pattern
+#      the construction and use of a service object are separated in Injector and Client
+#      classes respectively (add an abstraction class: Service)
 #
 #                         (HAS_A)             (IS_A)                  (HAS_A)
 #                Client  ........> "Service" <------- ServiceExample <........ Injector
@@ -25,6 +27,7 @@
 #                   |..............................................................| (HAS_A)
 #                                               injects
 
+# dependency injection pattern
 class Service(object):
     ''' an abstraction class '''
 
@@ -87,7 +90,7 @@ print client.greet()
 #                Adapter ........> "Adaptee" <------- AdapteeExample
 #                                "abstraction"
 #
-#       (Adapter & AdapteeExample both depend on an abstraction, making them "loosely coupled")
+#     (Adapter & AdapteeExample both depend on an abstraction, making them "loosely coupled")
 #
 
 class Duck(object):
@@ -122,7 +125,6 @@ duck = TurkeyToDuckAdapter(turkey)
 print duck.quack()
 
 #  conventional desgin (without dependency inversion principle)
-#  downside: any changes to the  may affect the 
 
 class ConventionalAdapter(Duck):
     ''' the adapter directly depends on the adaptee object (downside: any changes to the 
@@ -139,7 +141,7 @@ duck = ConventionalAdapter()
 print duck.quack()
 
 # - comparison of dependency injection pattern and adapter patter
-#   both rely on the dependency inversion principle, creating an abstraction class
+#   both apply the dependency inversion principle, creating an abstraction class
 #     adapter: the Adaptee class
 #     dependency injection: the Service class
 #   they are different in their purposes:
