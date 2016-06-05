@@ -1,0 +1,43 @@
+# principles
+  1) each test unit must be fully independent, regardless of the order they are called
+     a) each test is loaded with a fresh dataset, and do cleanup afterwards
+     b) handled by setUp() and tearDown() methods
+  2) run the tests often
+     a) ideally run the function's test automatically whenever saving the code
+     b) always run the full test suite before a coding session, and run it again after
+     c) implement a hook that runs all tests before pushing code to a shared repository
+  3) when to write new tests
+     a) write a broken unit test about what you want to develop next
+     b) when debugging the code: write a new test pinpointing the bug
+  4) use long and descriptive names for testing functions
+     function names will be displayed when a test fails
+     ex. test_square_of_number_2() / test_square_negative_number() ==> instead of test_square()
+ 
+# structure of project directory
+  PROJECT_DIR
+  |-- mycalc/
+  |   |-- calc.py                <== app name (class: App) 
+  |    -- __init__.py
+   -- tests/
+      |-- __init__.py
+       -- unit/
+          |-- __init__.py
+           -- test_calc.py       <== test_app (class: TestApp, function: test_functionality_long_description)
+
+  Python does not add the current directory to sys.path, but rather the directory that the script is in
+  1) need to add current directory to either sys.path or $PYTHONPATH:
+  2) add to .bashrc / .bash_profile / .profile
+     export PYTHONPATH=$PYTHONPATH:.
+
+# run tests
+  1) python tests/unit/test_calc.py
+       need to have unittest.main() in test_calc.py
+
+       if __name__ == '__main__':
+           unittest.main()
+
+  2) python -m unittest tests.unit.test_calc
+       do not need unittest.main() in testing modules
+  3) python -m unittest discover tests/unit
+       will look for all tests/unit/test*.py (Python2.7 support test discovery)
+
