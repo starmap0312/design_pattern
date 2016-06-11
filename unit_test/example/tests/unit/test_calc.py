@@ -44,5 +44,5 @@ class TestCalculator(unittest.TestCase):
         with self.assertRaises(ZeroDivisionError) as cm:
             self.cal.mod(7, 0)
 
-if __name__ == '__main__':
-    unittest.main()
+#if __name__ == '__main__':
+#    unittest.main()

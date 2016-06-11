@@ -12,6 +12,18 @@
   4) use long and descriptive names for testing functions
      function names will be displayed when a test fails
      ex. test_square_of_number_2() / test_square_negative_number() ==> instead of test_square()
+
+# types of tests
+  1) module interface
+     whether information are properly passed into and out of the module (unit)
+  2) local data structure
+     whether the local data is properly stored within the module (unit)
+  3) boundary conditions
+     whether the boundary conditions work as expected
+  4) error handling
+     whether the errors are properly handled
+  5) independent paths
+     whether all independent paths to see are properly executed and terminated at the end of the program
  
 # structure of project directory
   PROJECT_DIR
@@ -41,3 +53,14 @@
   3) python -m unittest discover tests/unit
        will look for all tests/unit/test*.py (Python2.7 support test discovery)
 
+# install mock under virtualenv
+  cd /path/to/source/directory
+  virtualenv env                 ==> will create an env/ directory
+  . ./env/bin/activate           ==> enter virtualenv
+  pip install mock
+  deactivate                     ==> exit virtualenv
+
+# nose
+  nosetests -w /path/to/tests/            ==> test discoverty
+    -w: specifying the working directory
+  nosetests /path/to/tests/test_app.py    ==> run a test
