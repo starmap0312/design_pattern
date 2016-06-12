@@ -1,0 +1,38 @@
+# architecture
+
+                     (uses)              (retrieved from)
+             Clients -----> Model object <--------------> DAO interface
+                                                                |           (store/retrieve)
+                                                         DAO implementation <--------------> database
+
+# test targets
+  1) test the DAO (data access object)
+     reason: make sure it correctly marshal the values (parameters) passed to the database
+             make sure it correctly marshal the results retrieved from the database
+     variable: changes to Model object or DAO layer will be caught by the tests
+     approach: replace the database (or intermediate layer, ex. JDBC, Hibernate, iBatis) with a mock
+               do not need to connect to the database
+  2) test the syntactic correctness of the (possibly generated) SQL
+     reason: make sure the (possibly generated) SQL works well with the database
+     variable: changes to database layer or RDBMS upgrades that change functionality will be caught by the tests
+     approach: because SQL dialects differ, run the (possibly generated) SQL against the correct version of RDBMS
+               don't attempt to mock all quirks of the RDBMS
+  3) test the semantic correctness of the SQL
+     reason: make sure that given a baseline (test) dataset, the operations (selects / inserts / updates)
+             produce the expected new dataset
+     variable: changes to client's bussiness logic (usage of the DAO) will be caught by the tests
+     approach: set up a baseline (test) dataset and compare the result with the expected result set
+               (or possibly do the test wholly in the database)
+
+# test approaches
+  1) use mock database server
+     execute unit tests against the application code that have mock db accessors injected
+  2) use a full db build
+     a) keep the entire schema and scripts for creating the database in source control
+     b) keep the sample / test data in data files that get loaded by part of the build process
+        when discovering data that cause errors, add them to the sample / test data
+     c) use a CI (continuous integration) server to build the database schema, load the sample data, and run tests
+        this requires the CI server to have access and ownership of its own dedicated test database instance
+     d) load the production database copy
+        difficulties: the copy may get out of date
+                      changes made to the copy are not propagated to the production systems (diverging) 

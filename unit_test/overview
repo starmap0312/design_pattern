@@ -13,7 +13,7 @@
      function names will be displayed when a test fails
      ex. test_square_of_number_2() / test_square_negative_number() ==> instead of test_square()
 
-# types of tests
+# what to tests
   1) module interface
      whether information are properly passed into and out of the module (unit)
   2) local data structure
@@ -24,6 +24,18 @@
      whether the errors are properly handled
   5) independent paths
      whether all independent paths to see are properly executed and terminated at the end of the program
+
+# test double
+  objects or procedures that look and behave like their release / production counterparts
+  types of test double
+  1) test stub: providing the tested code with "indirect input"
+  2) mock object: for verifying "indirect output" of the tested code
+                  by first defining the expectations before the tested code is executed
+  3) test spy: for verifying "indirect output" of the tested code
+               by asserting the expectations afterwards, instead of defining the expectations
+  4) fake object: used as a simpler implementation
+                  ex. using an in-memory database instead of doing a real database access
+  5) dummy object: when a parameter is needed but not used by the tested method
  
 # structure of project directory
   PROJECT_DIR
@@ -41,16 +53,16 @@
   2) add to .bashrc / .bash_profile / .profile
      export PYTHONPATH=$PYTHONPATH:.
 
-# run tests
+# run unit tests
   1) python tests/unit/test_calc.py
        need to have unittest.main() in test_calc.py
 
        if __name__ == '__main__':
            unittest.main()
 
-  2) python -m unittest tests.unit.test_calc
+  2) python -m unittest tests.unit.test_calc          ==> run a single test
        do not need unittest.main() in testing modules
-  3) python -m unittest discover tests/unit
+  3) python -m unittest discover tests/unit           ==> test discovery
        will look for all tests/unit/test*.py (Python2.7 support test discovery)
 
 # install mock under virtualenv
@@ -61,6 +73,8 @@
   deactivate                     ==> exit virtualenv
 
 # nose
-  nosetests -w /path/to/tests/            ==> test discoverty
+  nosetests -w /path/to/tests/                        ==> test discoverty
     -w: specifying the working directory
-  nosetests /path/to/tests/test_app.py    ==> run a test
+  nosetests /path/to/tests/test_app.py                ==> run a single test
+
+
