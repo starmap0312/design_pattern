@@ -1,8 +1,19 @@
-# Class:
-#  1) construct new objects on demand
-#     (an object asks a class to create an object)
-#  2) destruct them when not used
-#  3) knows what contracts to obey
+# Getters and Setters are bad design
+#  objects are active components: we shuld not get information or set status to them
+#  ex.
+#    (bad design)
+#
+#    Dog dog = new Dog();
+#    dog.setBall(new Ball());
+#    Ball ball = dog.getBall();
+#    dog.setWeight("23kg");
+#
+#    (good design)
+#
+#    Dog dog = new Dog("23kg");
+#    int weight = dog.weight();
+#    dog.take(new Ball());
+#    Ball ball = dog.give(); // dog object should never return NULL (NULL references are also bad design)
 #
 # Seven Virtues of a Good Object:
 #  1) exists in real life: the object is its representative in a program
@@ -25,7 +36,7 @@
 #
 #         any object from any class that implements interface Binary can work for me
 #     
-#     rule of thumb: every public method in a good object should implement from an interface
+#     rule of thumb: every public method in a good object should implement an interface
 #     a) an object working without a contract is impossible to mock in a unit test
 #     b) a contract-less object is impossible to extend via decoration
 #
@@ -214,4 +225,3 @@
 #           // logic through inheritance and through overloading the method isValid()
 #
 #      rule of thumb: a class should either be final or abstract (nothing in between)
-
