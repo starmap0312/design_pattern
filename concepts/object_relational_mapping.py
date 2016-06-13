@@ -80,6 +80,7 @@ name = person.getFirstName()
 #         Iterable<Post> iterate();
 #         Post add(Date date, String title);
 #     }
+#
 #     interface Post {
 #         int id();
 #         Date date();
