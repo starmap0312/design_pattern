@@ -88,7 +88,7 @@ name = person.getFirstName()
 #     }
 #
 #     // how to list all posts in the database table
-#     Posts posts = new PostgrePosts(dbase);
+#     Posts posts = new PostgrePosts(db);
 #     for (Post post : posts.iterate()){
 #         System.out.println("Title: " + post.title());
 #     }
@@ -99,14 +99,14 @@ name = person.getFirstName()
 #
 #     final class PostgrePosts implements Posts {
 #
-#         private final Source dbase;
+#         private final Source db;
 #
 #         public PostgrePosts(DataSource data) { // dependency injection by constructor
-#             this.dbase = data;
+#             this.db = data;
 #         }   
 #
 #         public Iterable<Post> iterate() {
-#             return new JdbcSession(this.dbase)
+#             return new JdbcSession(this.db)
 #                 .sql("SELECT id FROM post")
 #                 .select(
 #                     new ListOutcome<Post>(
@@ -114,7 +114,7 @@ name = person.getFirstName()
 #                             @Override
 #                             public Post map(final ResultSet rset) {
 #                                 return new PostgrePost(
-#                                     this.dbase,
+#                                     this.db,
 #                                     rset.getInteger(1)
 #                                 );
 #                             }
@@ -125,8 +125,8 @@ name = person.getFirstName()
 #
 #         public Post add(Date date, String title) {
 #             return new PostgrePost(
-#                 this.dbase,
-#                 new JdbcSession(this.dbase)
+#                 this.db,
+#                 new JdbcSession(this.db)
 #                 .sql("INSERT INTO post (date, title) VALUES (?, ?)")
 #                 .set(new Utc(date))
 #                 .set(title)
@@ -137,11 +137,11 @@ name = person.getFirstName()
 #
 #    final class PostgrePost implements Post {
 #
-#        private final Source dbase;
+#        private final Source db;
 #        private final int number;
 #
 #        public PostgrePost(DataSource data, int id) {
-#            this.dbase = data;
+#            this.db = data;
 #            this.number = id;
 #        }
 #
@@ -150,14 +150,14 @@ name = person.getFirstName()
 #        }
 #
 #        public Date date() {
-#            return new JdbcSession(this.dbase)
+#            return new JdbcSession(this.db)
 #                .sql("SELECT date FROM post WHERE id = ?")
 #                .set(this.number)
 #                .select(new SingleOutcome<Utc>(Utc.class));
 #        }
 #
 #        public String title() {
-#            return new JdbcSession(this.dbase)
+#            return new JdbcSession(this.db)
 #                .sql("SELECT title FROM post WHERE id = ?")
 #                .set(this.number)
 #                .select(new SingleOutcome<String>(String.class));
