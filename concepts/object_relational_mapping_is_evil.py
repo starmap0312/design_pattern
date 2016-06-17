@@ -112,10 +112,10 @@ name = person.getFirstName()
 #                     new ListOutcome<Post>(
 #                         new ListOutcome.Mapping<Post>() {
 #                             @Override
-#                             public Post map(final ResultSet rset) {
+#                             public Post map(final ResultSet result_set) {
 #                                 return new PostgrePost(
 #                                     this.db,
-#                                     rset.getInteger(1)
+#                                     result_set.getInteger(1)
 #                                 );
 #                             }
 #                         }
