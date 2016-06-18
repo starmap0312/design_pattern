@@ -12,7 +12,7 @@
 #    Employee employee = dept.getByName("Jeffrey");
 #    // better naming: Employee employee = dept.getByNameOrNullIfNotFound("Jeffrey");
 #
-#    if (employee == null) { // need an ad-hoc error handling block
+#    if (employee == null) { // need an ad-hoc error handling block (fail slowly)
 #        System.out.println("can't find an employee");
 #        System.exit(-1);
 #    } else {
@@ -68,7 +68,7 @@
 #
 #      Employee employee = employees.get("Jeffrey"); // use of get() method of Map interface in Java
 #
-#      if (employee == NULL) {
+#      if (employee == NULL) { // fail slowly
 #          throw new EmployeeNotFoundException();
 #      }
 #      return employee;
@@ -77,7 +77,7 @@
 #    
 #      ex.
 #
-#      // the get() method should raise an exception if no name found
+#      // implementation of throwing Exceptions in get() method
 #
 #      public Employee get(String name) {
 #       
@@ -112,7 +112,7 @@
 #      // the client code in OOP
 #      dept.getByName("Jeffrey").transferTo(dept2);
 #
-#      // an implementation of getByName(): it may return a NULL object
+#      // implementation of NULL object in getByName()
 #      public Employee getByName(String name) {
 #
 #         int id = database.find(name);
