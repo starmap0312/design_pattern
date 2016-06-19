@@ -91,11 +91,11 @@
 #
 #      public Employee get(String name) {
 #
-#          Iterator found = Map.search("Jeffrey"); // returns an iterator
-#          if (!found.hasNext()) {
+#          Iterator found = Map.search("Jeffrey");     // returns an iterator
+#          if (!found.hasNext()) {                     // search happens only when the queue is empty
 #              throw new EmployeeNotFoundException();
 #          }
-#          return found.next(); // first search
+#          return found.next();                        // search happens only when the queue is empty
 #      }
 #
 #
