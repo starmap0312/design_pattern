@@ -1,21 +1,5 @@
-# Getters and Setters are bad design
-#  objects are active components: we shuld not get information or set status to them
-#  ex.
-#    (bad design)
-#
-#    Dog dog = new Dog();
-#    dog.setBall(new Ball());
-#    Ball ball = dog.getBall();
-#    dog.setWeight("23kg");
-#
-#    (good design)
-#
-#    Dog dog = new Dog("23kg");
-#    int weight = dog.weight();
-#    dog.take(new Ball());
-#    Ball ball = dog.give(); // dog object should never return NULL (NULL references are also bad design)
-#
 # Seven Virtues of a Good Object:
+#
 #  1) exists in real life: the object is its representative in a program
 #     a) good objects:
 #        ex. an employee, a department, an HTTP request, a table in MySQL, a row in MySQL, 
@@ -168,16 +152,17 @@
 #
 #  7) class is either final or abstract
 #     final class: cannot be extended via inheritance
-#                  a final class is a black box that cannot be modified by any means
-#     abstract class: cannot have children (objects)
+#                  i.e. a final class is a black box that cannot be modified by any means
+#     abstract class: cannot be instanciated, i.e. cannot have objects
 #
 #     a) the only way to extend a final class is through decoration of his objects 
-#        ex. want to extend the read() method of class HTTPStatus to throw an exception if HTTP status is over 400
+#        ex. if we want to extend the read() method of class HTTPStatus to throw an exception if 
+#              the HTTP status is over 400
 #            if we inherit the HTTPStatus class, we risk breaking the logic of the entire parent class by
-#            overriding one of his method
-#            we are literally injecting a new "piece of implementation" right into the class
+#              overriding one of his method
+#              i.e. we are literally injecting a new "piece of implementation" right into the class
 #
-#        improvement: Decorator Pattern
+#        solution: Decorator Pattern
 #
 #          // treat it like a black box and decorate it with your own implementation
 #
@@ -202,7 +187,7 @@
 #        rule of thumb: a class without final is a bad design
 #
 #      b) an abstract class is the exact opposite case: it is incomplete and cannot instantiate any objects
-#         have to inject our custom implementation logic into it, but only into the places that it allows
+#         we have to inject our custom implementation logic into it, but only into the places that it allows
 #         i.e. the abstract methods
 #
 #         ex. 

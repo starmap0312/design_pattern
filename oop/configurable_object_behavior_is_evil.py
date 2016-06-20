@@ -99,7 +99,7 @@
 #       }
 #   }
 #  
-#   (refinement)
+#   (refinement: bad design)
 #
 #   class Page {
 #

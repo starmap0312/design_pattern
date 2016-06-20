@@ -2,6 +2,7 @@
 #   make your code highly cohesive and loosely coupled
 #
 # example:
+#
 #   // an interface for an object that is supposed to read a text somewhere and return it
 #   interface Text {
 #       String read();
@@ -93,7 +94,7 @@
 #     );
 #
 #  rule of thumb:
-#    1) avoid utility methods as much as possible, and use decorators instead
+#    1) avoid utility methods as much as possible: use decorators instead
 #    2) an ideal interface should contain only methods that you absolutely cannot remove
 #       everything else should be done through composable decorators         
 
