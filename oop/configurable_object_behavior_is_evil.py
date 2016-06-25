@@ -1,6 +1,8 @@
 # configuralble class is evil
 #
-# example:
+# a procedural programming example:
+#
+# (bad design)
 #
 # 1) basic class (works fine) 
 #
@@ -19,15 +21,14 @@
 #
 #  // the client code: read the content of Google front page
 #  String html = new Page("http://www.google.com").html();
-#  
-# (bad design)
 #
 # 2) extend the functionality of the class: can decode by "UTF-8" or others
 # 
+#   // the class becomes a configurable class
 #   class Page {
 #
 #       private final String uri;
-#       private final String encoding;      // a configurable field
+#       private final String encoding;      // add a configurable field
 #
 #       Page(final String address, final String enc) {
 #           this.uri = address;
@@ -38,7 +39,6 @@
 #           return IOUtils.toString(new URL(this.uri).openStream(), this.encoding);
 #       }
 #   }
-#   // the class becomes a configurable class
 #  
 # 3) extend the functionality of the class: can handle an empty page
 #
@@ -46,7 +46,7 @@
 #
 #       private final String uri;
 #       private final String encoding;      // a configurable field
-#       private final boolean alwaysHtml;   // a configurable field
+#       private final boolean alwaysHtml;   // add another configurable field
 #
 #       Page(final String address, final String enc, final boolean always) {
 #           this.uri = address;
@@ -56,7 +56,7 @@
 #
 #       public String html() throws IOException {
 #           String html = IOUtils.toString(new URL(this.uri).openStream(), this.encoding);
-#           if (html.isEmpty() && this.alwaysHtml) { // different behavior based on the configuration field
+#           if (html.isEmpty() && this.alwaysHtml) { // the method can have different behaviors
 #               html = "<html/>";                    // return "<html/>" if an empty page is loaded
 #           }
 #           return html;
@@ -70,7 +70,7 @@
 #       private final String uri;
 #       private final String encoding;      // a configurable field
 #       private final boolean alwaysHtml;   // a configurable field
-#       private final boolean encodeAnyway; // a configurable field
+#       private final boolean encodeAnyway; // add one more configurable field
 #
 #       Page(final String address, final String enc, final boolean always, final boolean encode) {
 #           this.uri = address;
@@ -84,31 +84,31 @@
 #           String html;
 #
 #           try {
-#               html = new String(bytes, this.encoding); // can use different encoding
+#               html = new String(bytes, this.encoding); // try to encode the bytes based on this.encoding
 #           } catch (UnsupportedEncodingException ex) {
-#               if (!this.encodeAnyway) {                // can handle unknown encoding or not
+#               if (!this.encodeAnyway) {                // if encodeAnyway is set, use default "UTF-8" encoding
 #                   throw ex;
 #               }
-#               html = new String(bytes, "UTF-8")
+#               html = new String(bytes, "UTF-8");
 #           }
 #
-#           if (html.isEmpty() && this.alwaysHtml) {     // can handle empty page
+#           if (html.isEmpty() && this.alwaysHtml) {     // if alwaysHtml is set, return "<html/>"
 #               html = "<html/>";
 #           }
 #           return html;
 #       }
 #   }
 #  
-#   (refinement: bad design)
+# 5) encapsulate the configuration fields in an object
 #
 #   class Page {
 #
 #       private final String uri;
 #       private final PageSettings settings;             // encapsulate the setting in one object
 #
-#       Page(final String address, final PageSettings stts) {
+#       Page(final String address, final PageSettings setting) {
 #           this.uri = address;
-#           this.settings = stts;
+#           this.settings = setting;
 #       }
 #
 #       // one big method with many logics and case handling, hard to extend and maintain
@@ -140,8 +140,6 @@
 #   ).html();
 #  
 #
-###
-#
 #  (good design: use composable decorators)
 #
 #  // the client code
@@ -150,8 +148,7 @@
 #  String html = new AlwaysTextPage(new TextPage(page, "ISO_8859_1"), page).html();
 #  
 #
-#  // implementation of classes
-#
+#  // the core class
 #  class DefaultPage implements Page {
 #
 #      private final String uri;
@@ -166,9 +163,7 @@
 #      }
 #  }
 #
-#  // a decorator class: 
-#  //   new NeverEmptyPage(new DefaultPage("http://www.google.com"))
-#
+#  // a decorator class 
 #  class NeverEmptyPage implements Page {
 #
 #      private final Page origin;
@@ -186,10 +181,11 @@
 #          return bytes;
 #      }
 #  }
+#
+#  // the client code
+#  Page page = new NeverEmptyPage(new DefaultPage("http://www.google.com"));
 #  
-#
-#  // a decorator class: new TextPage(Page, "ISO_8859_1")
-#
+#  // a decorator class
 #  class TextPage {
 #
 #      private final Page origin;
@@ -205,8 +201,10 @@
 #      }
 #  }
 #
-#  // a decorator class: new AlwaysTextPage(new TextPage(page, "ISO_8859_1"), Page)
+#  // the client code
+#  Page page = new TextPage(Page, "ISO_8859_1");
 #
+#  // a decorator class
 #  class AlwaysTextPage {
 #
 #      private final TextPage origin;
@@ -227,8 +225,13 @@
 #          return html;
 #      }
 #  }
+#
+#  // the client code
+#  Page page = new NeverEmptyPage(new DefaultPage("http://www.google.com"))
+#  Page textpage = new AlwaysTextPage(new TextPage(page, "ISO_8859_1"), page)
 #  
-#  class OncePage implements Page { // introduce one more decorator class to avoid duplicate HTTP request
+#  // one more decorator class to avoid duplicate HTTP request (optional)
+#  class OncePage implements Page {
 #
 #      private final Page origin;
 #      private final AtomicReference<byte[]> cache = new AtomicReference<>;
@@ -247,9 +250,7 @@
 #  }
 #  
 #  // the final client code
-#
 #  Page page = new NeverEmptyPage(new OncePage(new DefaultPage("http://www.google.com")))
-#
-#  String html = new AlwaysTextPage(new TextPage(page, "ISO_8859_1"), "UTF-8").html();
+#  String html = new AlwaysTextPage(new TextPage(page, "ISO_8859_1"), page).html();
 #  
 

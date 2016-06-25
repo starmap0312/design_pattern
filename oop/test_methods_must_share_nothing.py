@@ -1,3 +1,4 @@
+# testing methods must share nothing
 #
 #  example:
 #
