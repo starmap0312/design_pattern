@@ -1,5 +1,7 @@
 # Memento Pattern
 # keeps the saved state external and provides recovery capability
+#
+# bad design pattern: this idea implies that objects are mutable
 
 class Originator(object):
     # can get current state for saving in memento and can restore from memento's saved state

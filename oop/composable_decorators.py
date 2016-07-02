@@ -1,4 +1,5 @@
 # Decorator pattern
+#
 #   make your code highly cohesive and loosely coupled
 #
 # example:
@@ -97,4 +98,74 @@
 #    1) avoid utility methods as much as possible: use decorators instead
 #    2) an ideal interface should contain only methods that you absolutely cannot remove
 #       everything else should be done through composable decorators         
-
+#
+# vertical and horizontal decorating
+#
+# 1) vertical decorating
+#
+#    interface Numbers {
+#        Iterable<Integer> iterate();
+#    }
+#
+#    Numbers numbers = new Sorted(
+#        new Unique(
+#            new Odds(
+#                new Positive(
+#                    new ArrayNumbers(
+#                        new Integer[] {
+#                            -1, 78, 4, -34, 98, 4,
+#                        }
+#                    )
+#                )
+#            )
+#        )
+#    );
+#
+#    numbers.iterate();
+#
+# 2) horizontal decorating
+#
+#    interface Numbers {
+#        Iterable<Integer> iterate();
+#    }
+#
+#    interface Diff {
+#        Iterable<Integer> apply(Iterable<Integer> origin);
+#    }
+#
+#    final class Modified implements Numbers {
+#
+#       private final File file;
+#
+#       public Modified(final Numbers src, Diff [] app) {
+#           this.file = src;
+#           this.apps = app;
+#       }
+#
+#       @Override
+#       public String iterate() {
+#           Iterable<Integer> rc = this.file.iterate();
+#           for(app : apps) {
+#               rc = app.apply(rc);
+#           }
+#           return rc;
+#       }
+#
+#    }
+#
+#    // implements the core functionality of iterating numbers through instances of Positive, Odds, Unique, and Sorted
+#    Numbers numbers = new Modified(
+#        new ArrayNumbers(
+#            new Integer[] {
+#                -1, 78, 4, -34, 98, 4,
+#            }
+#        ),
+#        new Diff[] {
+#            new Positive(),
+#            new Odds(),
+#            new Unique(),
+#            new Sorted()
+#        }
+#    );
+#
+#    numbers.iterate();

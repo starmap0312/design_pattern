@@ -21,8 +21,7 @@
 #   to create the implementation objects
 
 class Stack(object):
-    # create an interface/wrapper class that HAS_A implementation object and
-    # delegates all requests to it
+    # create an interface/wrapper class that HAS_A implementation object and delegates all requests to it
 
     def __init__(self, a_type=None):
         # creation of implementation classes through parameter, direct coupling
@@ -73,7 +72,7 @@ class StackImp(object):
     def pop(self):
         raise NotImplementedError
 
-class StackMine(object):
+class StackMine(StackImp):
     # derive the separate implementations from the common abstraction
 
     def __init__(self):

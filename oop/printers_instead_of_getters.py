@@ -1,4 +1,5 @@
 # Getters and Setters are bad design
+#
 #  objects are active components: we shuld not get information or set status to them
 #
 #  ex.
@@ -84,7 +85,7 @@
 #
 #  // an object with multiple print methods would become a problem
 #
-#  (improvement)
+#  (good design)
 #
 #  public class Book {
 #
