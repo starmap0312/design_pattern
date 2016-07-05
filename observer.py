@@ -1,4 +1,6 @@
-# Observer Pattern
+# Observer Pattern (a GOOD design pattern)
+# - the name is bad: use Source (Observable) and Target (Observer) instead
+#   the Source generates events and the Target listens to them
 # object pattern: relationships between objects are established at run time via composition
 # behavioral pattern: how classes and objects interact and distribute responsibilities
 # - define a one-to-many dependency between objects so that when one object changes state,

@@ -1,4 +1,6 @@
-# Visitor Pattern
+# Visitor Pattern (a BAD design pattern)
+# - it is bad because it treats objects as data structures that we can manipulate
+#   a rather procedural design pattern
 # a way to easily add new operations on existing object structures
 # open/closed principle: open for extension, but closed for modification
 

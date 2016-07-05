@@ -1,4 +1,5 @@
-# State Pattern
+# State Pattern (a BAD design pattern)
+# - it is bad because it usually implies object mutability
 # object pattern: responsibilities between objects are established at run time via composition
 # behavioral pattern: how classes and objects interact and distribute responsibilities
 # - used when a service object needs to provide different behaviors based on various conditions:

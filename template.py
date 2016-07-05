@@ -1,4 +1,5 @@
-# Template Method
+# Template Method (a GOOD design pattern)
+# - try to keep classes final
 # behavioral pattern: how classes and objects interact and distribute responsibilities
 # class pattern: relationships between classes are established at compile time
 # - the skeleton of the algorithm is defined in superclass, whereas parts of the algorithm

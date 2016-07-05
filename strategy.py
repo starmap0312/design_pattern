@@ -1,4 +1,4 @@
-# Strategy Pattern
+# Strategy Pattern (a GOOD design pattern)
 # object pattern: relationships between objects are established at run time via composition
 # behavior pattern: how classes and objects interact and distribute responsibilities
 # - strategy pattern is like template method except in its granularity
