@@ -1,4 +1,6 @@
-# Facade Pattern
+# Facade Pattern (a BAD design pattern)
+# - it is bad because we need objects themselves only, not facades for them
+# - it is procedural in its spirit (a facade is nothing more than a collection of procedures)
 # creational pattern
 # - provides a simplified interface to a larger body of code, ex. a class library, and hides
 #   the complexity of larger systems

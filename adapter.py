@@ -1,4 +1,4 @@
-# Adapter Pattern
+# Adapter Pattern (a GOOD design pattern)
 # class pattern: relationships between classes are established at compile time
 # structural pattern: composes classes or objects into larger structures
 # - adapter provides a different interface to its subject. proxy provides the same interface.

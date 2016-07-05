@@ -1,4 +1,4 @@
-# Abstract Factory Pattern
+# Abstract Factory Pattern (an OK design pattern)
 #
 #             AbstractFactory
 #              ^          ^

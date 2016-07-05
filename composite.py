@@ -1,4 +1,4 @@
-# Composite Pattern
+# Composite Pattern (a GOOD design pattern)
 # object pattern: relationships between objects are established at run time via composition
 # structural pattern: composes classes and objects into larger structures
 # - containers that contain containees, each of which could be a container

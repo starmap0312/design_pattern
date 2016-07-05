@@ -1,4 +1,4 @@
-# Bridge Pattern
+# Bridge Pattern (a GOOD design pattern)
 # - provides a way to decouple abstraction (interface) from implementation
 # - bridge pattern is designed up-front to let the abstraction and implementation
 #   so that they can vary independently, whereas adapter makes things work after they're designed

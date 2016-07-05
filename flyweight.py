@@ -1,4 +1,5 @@
-# Flyweight Pattern
+# Flyweight Pattern (a BAD design pattern)
+# - a fix for a performance problem in Java (not use it unless there is a really critical performance issue)
 # use a centralized collection to reduce memory and creation overhead 
 
 class CoffeeFlavor(object):

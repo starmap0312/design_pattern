@@ -27,7 +27,8 @@
 #    decorator pattern
 #  - create an intermediate object that mediate two classes (the two classes are low coupling)
 #    ex. in MVC (model-view-controller), the controller mediate between data (model) and its
-#    representation (view) 
+#        representation (view) 
+#        MVC is a BAD design pattern, as it is rather procedural
 #
 #  5) Information Expert
 #  - determine where to delegate responsibilities, including methods, fields, and so on

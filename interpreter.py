@@ -1,5 +1,7 @@
-# Interpreter Pattern
-# composite and indivisual nodes are treated uniformly
+# Interpreter Pattern (an OK design pattern)
+# - should be called Expression Design Pattern (cause it ends with -er)
+# - composite and indivisual nodes are treated uniformly
+# 
 
 class Expression(object):
     # an interface for all nodes of the syntax tree

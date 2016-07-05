@@ -12,7 +12,7 @@
 #    Employee employee = dept.getByName("Jeffrey");
 #    // better naming: Employee employee = dept.getByNameOrNullIfNotFound("Jeffrey");
 #
-#    if (employee == null) { // need an ad-hoc error handling block (fail slowly)
+#    if (employee == null) { // an ad-hoc error handling block (fail slowly)
 #        System.out.println("can't find an employee");
 #        System.exit(-1);
 #    } else {

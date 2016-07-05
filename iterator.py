@@ -1,4 +1,13 @@
-# Iterator Pattern
+# Iterator Pattern (a BAD design pattern)
+# - it is bad because the iterator object is mutable (use an immutable cursor instead)
+#   alternatives:
+#     a) for-each loop
+#        declares explicitly that all of elements from container should be processed
+#     b) selectors:
+#        when for-each is not appropriate because not all of objects from container should be processed
+#        unlike iterators, selectors allow to manifest in one place what kind objects is to be processed
+#        iterators are low level objects, whereas selectors allow programmers to express explicitly what
+#          they want to process and so that they are high level objects
 # - provide a way to access the elements of an aggregate object (container) sequentially, 
 #   without exposing its internal data structure (representation)
 #   a) decouple iteration of a collection from its data structure

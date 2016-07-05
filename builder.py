@@ -1,4 +1,6 @@
-# Builder Pattern
+# Builder Pattern (a BAD design pattern)
+# - it is bad because it encourages to create complex objects
+#   refactor the code so that it is easy to create an object through its constructor
 # - unlike creational pattern that constructs products in one shot, the builder pattern constructs
 #   the product step by step
 # - when the constructor of a product contains too many parameters, consider use a builder

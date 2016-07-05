@@ -1,4 +1,4 @@
-# Command Pattern
+# Command Pattern (an OK design pattern)
 # object pattern: responsibilites between objects are established at run time via composition
 # behavioral pattern: how classes and objects interact and distribute responsibilites
 # - a combination of using adapter, delegation, dependency injection, and dependency inversion

@@ -1,4 +1,6 @@
-# Mediator Pattern
+# Mediator Pattern (a BAD design pattern)
+# - objects should communicate with each other directly
+# - make objects smaller and simpler, rather than inventing the mediators
 # behavioral pattern: encapsulate how a set of objects interact 
 # objects no longer interact with each other directly, instead they communicate through a
 # mediator object, thus lowering the coupling of objects

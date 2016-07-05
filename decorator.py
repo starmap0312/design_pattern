@@ -1,4 +1,4 @@
-# Decorator Pattern
+# Decorator Pattern (a GOOD design pattern)
 # - adapter pattern vs. decorator pattern:
 #   (both applying the dependency inversion principle: adding an abstraction layer)
 #

@@ -1,4 +1,4 @@
-# Factory Method
+# Factory Method (an OK design pattern)
 # creational pattern
 # class pattern: relationships between classes are established at compile time
 # - encapsulate object creation in one method

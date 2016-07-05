@@ -1,4 +1,5 @@
-# Memento Pattern
+# Memento Pattern (a BAD design pattern)
+# - it is bad because it implies that objects are mutable
 # keeps the saved state external and provides recovery capability
 #
 # bad design pattern: this idea implies that objects are mutable
