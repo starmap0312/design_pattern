@@ -1,4 +1,3 @@
-#import ConfigParser
 import configparser
 
 parser = configparser.ConfigParser()

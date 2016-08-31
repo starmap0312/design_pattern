@@ -6,6 +6,7 @@ print("json.dumps: convert a python dict to a string")
 a_str = json.dumps(a_dict)
 print(a_str)
 
+print("json.dumps: convert a python dict to a string with indent=2")
 a_str = json.dumps(a_dict, indent=2)
 print(a_str)
 
