@@ -4,6 +4,7 @@
 #   they tear objects apart and keeping parts in different places
 #     ex. containers, sessions, managers, controllers
 #
+#
 # example: @Inject
 #
 # (bad design)
@@ -186,3 +187,70 @@
 #   only the object knows how to print itself to the XML
 #   consider to use decorator class when the functionalities grow
 #
+#
+# example: @RetryOnFailure
+#
+# (bad design)
+#
+#   import com.jcabi.aspects.RetryOnFailure;
+#
+#   // annotates an object's method
+#   class Foo {
+#
+#       @RetryOnFailure
+#       public String load(URL url) {
+#           return url.openConnection().getContent();
+#       }
+#   }
+#
+#   // the annotation technically turns the code into this
+#   class Foo {
+#
+#       public String load(URL url) {
+#           while (true) {                 // infinite-loop for the retry functionality
+#               try {
+#                   return _Foo.load(url);
+#               } catch (Exception ex) {
+#                   // ignore it
+#               }
+#           }
+#       }
+#
+#       class _Foo {                       // 
+#           public String load(URL url) {
+#               return url.openConnection().getContent();
+#           }
+#       }
+#   }
+#
+# why is it bad?
+#   we don't see and don't control the instantiation of that supplementary object
+#   we must see how our objects are composed: object composition is hidden somewhere behind the scenes
+#
+# (good design: use decorator class)
+#
+#   class FooThatRetries implements Foo {
+#
+#       private final Foo origin;
+#
+#       FooThatRetries(Foo foo) {
+#           this.origin = foo;
+#       }
+#
+#       public String load(URL url) {
+#           return new Retry().eval(
+#               new Retry.Algorithm<String>() {
+#                   @Override
+#                   public String eval() {
+#                       return FooThatRetries.this.load(url);
+#                   }
+#               }
+#           );
+#       }
+#   }
+#
+#   // the client code
+#   Foo foo = new FooThatRetries(new Foo());
+#
+# why is it good?
+#   we can see the entire composition process

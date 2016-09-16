@@ -1,4 +1,5 @@
 # configuralble class/object is evil
+#   there should not be any "configurations" in OOP, ex. Spring XML configuration mechanisms
 #   using object properties as configuration parameters is a very common mistake
 #   this makes objects implicitly mutable: we configure them
 #     we "change their behavior" by injecting parameters or a entire setting/configuration object into them
