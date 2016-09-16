@@ -1,8 +1,16 @@
-# configuralble class is evil
+# configuralble class/object is evil
+#   using object properties as configuration parameters is a very common mistake
+#   this makes objects implicitly mutable: we configure them
+#     we "change their behavior" by injecting parameters or a entire setting/configuration object into them
+#   encapsulated properties must not be used to change the behavior of an object
+#     an object's properties are its inherent characteristics (in order to represent a real-world entity)
+#     an object's behavior should be immutable
 #
-# a procedural programming example:
+# example:
 #
-# (bad design)
+# (bad design: procedural programming)
+#
+# // from simple to complex, adding configuration fields or one complex, configuration object
 #
 # 1) basic class (works fine) 
 #
@@ -139,8 +147,12 @@
 #           .withEncodeAnyway(false)
 #   ).html();
 #  
+#  why is it bad?
+#    the object is responsible for too many things, a big and non-cohesive object
+#    the code becomes less testable, less maintainable and less readable
+#    
 #
-#  (good design: use composable decorators)
+#  (good design: distribute the responsibilities by using composable decorators)
 #
 #  // the client code
 #  Page page = new NeverEmptyPage(new DefaultPage("http://www.google.com"))
@@ -148,7 +160,7 @@
 #  String html = new AlwaysTextPage(new TextPage(page, "ISO_8859_1"), page).html();
 #  
 #
-#  // the core class
+#  // the core class: responsible for one simple thing (a cohesive object)
 #  class DefaultPage implements Page {
 #
 #      private final String uri;
@@ -163,7 +175,7 @@
 #      }
 #  }
 #
-#  // a decorator class 
+#  // a decorator class: extend the functionality of the html() method 
 #  class NeverEmptyPage implements Page {
 #
 #      private final Page origin;
@@ -185,7 +197,7 @@
 #  // the client code
 #  Page page = new NeverEmptyPage(new DefaultPage("http://www.google.com"));
 #  
-#  // a decorator class
+#  // a decorator class: has a single configuration field for encoding
 #  class TextPage {
 #
 #      private final Page origin;
@@ -210,9 +222,9 @@
 #      private final TextPage origin;
 #      private final Page source;
 #
-#      AlwaysTextPage(final TextPage ori, final Page src) {
-#          this.origin = ori;
-#          this.source = src;
+#      AlwaysTextPage(final TextPage origin, final Page source) {
+#          this.origin = origin;                 // an encoded page (the encoding may be unknown)
+#          this.source = source;                 // default original page
 #      }
 #
 #      public String html() throws IOException { // enchance the html() method to handle unknown encoding
