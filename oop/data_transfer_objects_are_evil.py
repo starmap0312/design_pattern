@@ -38,22 +38,36 @@
 #   
 # (good desgin)
 #
-#   Book bookById(int id) {
-#     return new JsonBook(                // not yet load data from RESTful API, only declare the access object
-#       /* RESTful API access point */
-#     );
+#   class Api {
+#
+#       Book bookById(int id) {
+#           return new JsonBook(   // not yet load data from RESTful API, only declare the access object
+#           /* RESTful API access point */
+#           );
+#       }
 #   }
-#   
+#
 #   Book book = api.bookById(123);
 #
-#   void save(Database db) {              // ask the Book object actively save its content to database
-#     JsonObject json = /* Load it from RESTful API */    // data are loaded when on demand
-#     db.createBook(                      // the data stays inside the object and are invisble to outside objects
-#       json.getString("isbn"),
-#       json.getString("title"),
-#       json.getString("author")
-#     );
+#   // Api is responsible for providing you a JsonBook object via its id
+#
+#   class JsonBook {
+#
+#       void save(Database db) {    // ask the Book object actively save its content to database
+#           JsonObject json = /* Load it from RESTful API */    // data are loaded when on demand
+#           db.createBook(          // the data stays inside the object and are invisble to outside objects
+#               json.getString("isbn"),
+#               json.getString("title"),
+#               json.getString("author")
+#           );
+#       }
 #   }
+#
+#   // JsonBook is responsible for saving its content to database
+#   //   it knows how to get the json format of its content
+#   //   its client does not need to know how and when it will be done
+#   // JsonBook serves as a representative of its content (no need to store them)
+#   //   it may get them from outside, ex. a RESTful api service
 #
 #   book.save(database);
 #
