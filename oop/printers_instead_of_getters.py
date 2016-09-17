@@ -1,16 +1,19 @@
 # Getters and Setters are bad design
 #
-#  objects are active components: we shuld not get information or set status to them
+#  1) getters and setters expose object's data
+#  2) they make objects passive data hodlers and we get information from or set status to them
+#     objects should be active components, with some responsibility
+#  3) they encourage procedural programming (we don't try objects, and only trust the data they store)
 #
 #  ex.
-#    (bad design)
+#    (bad design: passive data holders)
 #
 #    Dog dog = new Dog();
 #    dog.setBall(new Ball());
 #    Ball ball = dog.getBall();
 #    dog.setWeight("23kg");
 #
-#    (good design)
+#    (good design: active entities)
 #
 #    Dog dog = new Dog("23kg");
 #    int weight = dog.weight();
@@ -49,12 +52,13 @@
 #      }
 #  }
 #  // this is an offensive way of treating the object (exposing everything inside to the public)
-#  // i.e. anyone can access in many possible ways
+#  // i.e. anyone can access/modity its content/behaviors in many possible ways
 #
-#  (good design)
-#  // why getters exist?
-#  // because we don't trust our objects, and only trust the data they store
-#  // we don't want this Book object to generate the XML (just want it to give us the data)
+#  why is it bad?
+#   it is procerual thinking, we want control everything
+#   we don't want the Book object to generate the XML, and just want it to give us the data
+#
+#  (good design: let the Book object actively takes the responsibility of generating XML format)
 #
 #  public class Book {
 #
@@ -70,6 +74,7 @@
 #  }
 #  // the object no longer expose its internals
 #  
+#  // but if a similar responsibility is needed (the object may be responsible for too many things)
 #  public class Book {
 #
 #      private final String isbn = "0735619654";
@@ -85,7 +90,7 @@
 #
 #  // an object with multiple print methods would become a problem
 #
-#  (good design)
+#  (good design: delegate the printer responsibility to other objects, i.e. collaborators)
 #
 #  public class Book {
 #
@@ -96,13 +101,15 @@
 #          return media.with("isbn", this.isbn).with("title", this.title);
 #      }
 #  }
-#  // the book should not have any idea about what is printed
+#  // the book object has no idead what is printed
+#  // it is only responsible for adding its content to the printer object, and providing it to other objects
 #  
+#  // an object that knows how to add new json (key, value) pairs and is responsible for printing the json format
 #  class JsonMedia implements Media {
 #
 #      private final JsonObjectBuilder builder;
 #
-#      JsonMedia() {
+#      JsonMedia(String head) {
 #          this(Json.createObjectBuilder());
 #      }
 #
@@ -111,8 +118,8 @@
 #      }
 #
 #      @Override
-#      public Media with(String name, String value) {
-#          return new JsonMedia(this.builder.add(name, value));
+#      public Media with(String key, String value) { // the object provides a way to add content to itself
+#          return new JsonMedia(this.builder.add(key, value));
 #      }
 #
 #      public JsonObject json() {
@@ -124,3 +131,6 @@
 #  JsonMedia media = new JsonMedia("book");
 #  JsonObject json = book.print(media).json();
 #  
+#  // the JsonMedia can be replaced by other other objects that also implements Media
+#  // ex. XmlMedia who knows how to add new xml contents via with() and
+#  //     provides xml() for printing the XML format

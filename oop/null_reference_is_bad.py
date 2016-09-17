@@ -1,6 +1,44 @@
 # NULL references
+#   the presence of NULL refernece is a clear indicator of code smell
 #   NULL references is an inheritance of procedural programming, ex. C
-#   OOP uses Null Objects / Exceptions
+#     OOP does not use it but uses Null Objects / Exceptions
+#
+# example: InputStream, resource that needs to be open and close explicitly
+#
+# (bad design: use of NULL reference)
+#
+#   InputStream input = null;
+#
+#   try {
+#       input = url.openStream();    // open the resource, may throw IOException if unable to open
+#       ... ...                      // read the stream, may throw IOException
+#   } catch (IOException ex) {
+#       throw new RuntimeException(ex);
+#   } finally {
+#       if (input != null) {         // finally close the resource if not null
+#           input.close();
+#       }
+#   }
+#
+# (good design: no NULL reference, throw exceptions)
+#
+#   final InputStream input;
+#
+#   try {
+#       input = url.openStream();    // open the resource, may throw IOException
+#   } catch (IOException ex) {
+#       throw new RuntimeException(ex);
+#   }
+#
+#   try {
+#       ... ...                      // read the stream, may throw IOException
+#   } catch (IOException ex) {
+#       throw new RuntimeException(ex);
+#   } finally {                      // finally close the resource
+#       input.close();
+#   }
+#
+# example:
 #
 # 1) use of NULL references: need Ad-hoc Error Handling in client code
 #    // whenever you get an object, you need to check whether it is NULL or a valid object reference
@@ -9,7 +47,7 @@
 #
 #    ex. the client code in procedural programming 
 #
-#    Employee employee = dept.getByName("Jeffrey");
+#    Employee employee = dept.getByName("Jeffrey"); // may return null
 #    // better naming: Employee employee = dept.getByNameOrNullIfNotFound("Jeffrey");
 #
 #    if (employee == null) { // an ad-hoc error handling block (fail slowly)
@@ -19,8 +57,7 @@
 #        employee.transferTo(dept2);
 #    }
 #
-#   // implementation of NULL references
-#
+#   // implementation of NULL references, returning null if not found
 #   public Employee getByName(String name) {
 #       int id = database.find(name);
 #       if (id == 0) {
@@ -29,12 +66,13 @@
 #       return new Employee(id);
 #   }
 #
-# 2) in OOP, there are two alternatives to NULL references: a) NULL object b) throwing Exceptions
-#
-#    ex. the client code in OOP
+# 2) in OOP, there are two alternatives to NULL references:
+#    a) NULL object
+#    b) throwing Exceptions
 #
 #    // if getByName fails, it should raise an exception, i.e. fail fast, hiding failure from the client
 #
+#    // the client code
 #    dept.getByName("Jeffrey").transferTo(dept2);
 #
 #   a) implementation of NULL objects

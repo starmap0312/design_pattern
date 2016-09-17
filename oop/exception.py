@@ -25,12 +25,14 @@
 #       public void send(final int data) {
 #           try {
 #               this.stream.write(x);
-#           } catch (IOException ex) {
+#           } catch (IOException ex) { // the object catches the exception without re-throwing it
 #               ex.printStackTrace();
 #           }
 #       }
 #   }
 #
-#   // the client code: the error information is hidden from the client (can't trust the send() method anymore)
+#   // the client code
 #   new Wire(stream).send(1);
 #
+#   // the error information is hidden from the client
+#   //   we can't trust the object anymore, as we don't know what's going on if exception happens
