@@ -104,6 +104,8 @@
 #
 # vertical and horizontal decorating
 #
+# example:
+#
 # 1) vertical decorating
 #
 #    // a Numbers object knows how to traverse its numbers in order
@@ -111,6 +113,7 @@
 #        Iterable<Integer> iterate();
 #    }
 #
+#    // the client code
 #    Numbers numbers = new Sorted(
 #        new Unique(
 #            new Odds(
@@ -160,8 +163,7 @@
 #
 #    }
 #
-#    // implements the core functionality of iterating numbers through instances of Positive, Odds,
-#    //   Unique, and Sorted
+#    // the client code
 #    Numbers numbers = new Modified(
 #        new ArrayNumbers(
 #            new Integer[] {
@@ -177,3 +179,10 @@
 #    );
 #
 #    numbers.iterate();
+#
+# // in vertical decorating, the decorator classes Positive, Odds, etc. implement the Numbers interface
+# //   they decorate the original object's iterate() method in their own iterate() method
+# // in horizontal decorating, the decorator classes Positive, Odds, etc. implement a different Diff interface
+# //   they work together as a composite decorator, i.e. Modified object, to decorate the original object's
+# //   iterate() method in the composite decorator's iterate() method 
+
