@@ -33,11 +33,33 @@
 #       }
 #   }
 #
-#   // the client code
+#   // the client code: does know if an exception happens or not
 #   new Wire(stream).send(1);
 #
 #   // the error information is hidden from the client
 #   //   we can't trust the object anymore, as we don't know what's going on when exception happens
+#
+# (good design: don't catch exceptions unless you want to add more information and re-throw it)
+#
+#   final class Wire {
+#
+#       private final OutputStream stream;
+#
+#       Wire(final OutputStream stm) {
+#           this.stream = stm;
+#       }
+#
+#       public void send(final int data) throws IOException {
+#           this.stream.write(x);
+#       }
+#   }
+#
+#   // the client code: there only one entry-point for handling the exceptions and the client knows about it 
+#   try {
+#       new Wire(stream).send(1);
+#   } catch (IOException ex) {
+#       ex.printStackTrace();
+#   }
 #
 # example:
 #
@@ -84,3 +106,14 @@
 #
 #   // an exception message must describe the problem and show as much detail as possible
 #
+# example: Java exception chaining
+#
+#   try {
+#       try {
+#           throw new Exception("One");
+#       } catch (Exception e) {
+#           throw new Exception("Two", e);    ==> add more information and re-throw the exception
+#       }
+#   } catch (Exception e) {
+#       e.printStackTrace(System.out);        ==> print out the stack trace
+#   }
