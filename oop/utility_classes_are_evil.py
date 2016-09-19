@@ -1,8 +1,8 @@
-#  utility classes are evil
-#    1) not proper objects
-#    2) inherited from procedural programming (a functional decomposition paradigm)
+# utility classes are evil
+#   not proper objects
+#   inherited from procedural programming (a functional decomposition paradigm)
 #
-#  ex. max() utility method
+# example: a utility method max() for selecting the maximum value of two
 #
 #      (bad design: procedural programming)
 #
@@ -22,6 +22,7 @@
 #      // 1) instantiate and compose objects: let them manage data when and how they desire
 #      // 2) instead of calling supplementary static functions, we should create objects that are capable of
 #      //    exposing the behavior we are seeking
+#      //    ex. create Max objects responsible for selecting maximum value of its two values
 #
 #      public class Max implements Number {
 #
@@ -42,7 +43,7 @@
 #      // the client code
 #      int max = new Max(10, 5).intValue();
 #
-#  ex. transform() utility method: read a text file, trim every line, and save in another file
+# example: a utility method transform() for reading a text file, trimming every line, and saving in another file
 #
 #      (bad design: procedural programming)
 #
@@ -59,29 +60,118 @@
 #      (good design: object-oriented programming)
 #
 #      void transform(File in, File out) {
-#          Collection<String> src = new Trimmed(
-#              new FileLines(new UnicodeFile(in))
-#          );
-#          Collection<String> dest = new FileLines(
-#              new UnicodeFile(out)
-#          );
+#          Collection<String> src = new Trimmed(new FileLines(new UnicodeFile(in)));
+#          Collection<String> dest = new FileLines(new UnicodeFile(out));
 #          dest.addAll(src);
 #      }
-#      // 1) FileLines implements Collection<String> and encapsulates all file reading and writing operations
-#      //    i.e. instances of FileLines behave exactly as a collection of strings and hides all I/O operations
-#      // 2) when we iterate it: a file is being read
-#      //    when we addAll() to it: a file is being written
-#      // 3) Trimmed (Decorator pattern) also implements Collection<String>
-#      //    every time the next line is retrieved, it gets trimmed
-#      // 4) Trimmed, FileLines, and UnicodeFile: each of them is responsible for its own single feature
-#      //    following perfectly the single responsibility principle
-#      // 5) it is much easier to develop, maintain and unit-test class FileLines rather than using a readLines()
-#      //    method in a 80+ methods and 3000 lines utility class FileUtils
-#      // 6) an object-oriented approach enables lazy execution
-#      //    i.e. the in file is not read until its data is required
-#      //    if we fail to open out due to some I/O error, the first file won't even be touched
-#      //    the whole task starts only after we call addAll()
-#      // 7) we instantiate and compose smaller objects into bigger ones: this object composition is rather
-#      //    cheap for the CPU since it doesn't cause any data transformations
-#      // 8) in an object-oriented world, there is no data: there are only objects and their behavior
-
+#
+#      // 1) class FileLines: encapsulates all file reading and writing operations
+#      //      implements Collection<String>
+#      //      i.e. behaves exactly as a collection of strings and hides all I/O operations
+#      //           when we iterate() it, a file is being read
+#      //           when we addAll() to it, a file is being written
+#      // 2) class Trimmed: every time the next line is retrieved, it gets trimmed
+#      //      a decorator class, also implementing Collection<String>
+#      // 3) class UnicodeFile: reads and writes files as unicode encoding
+#      //      implements FILE 
+#      // 4) advantages:
+#      //      every class has only one responsibility, following the single responsibility principle
+#      //      much easier to develop, maintain and unit-test classes
+#      //      enables lazy execution: the file is not read until its data is required
+#      //        i.e. the whole task starts only after we call addAll()
+#
+# example: a utility method readWords() for reading words from a file
+#
+#   (bad design)
+#
+#   class FileUtils {
+#
+#       public static Iterable<String> readWords(File f) {
+#           String text = new String(Files.readAllBytes(Paths.get(f)), "UTF-8");
+#           Set<String> words = new HashSet<>();
+#           for (String word : text.split(" ")) {
+#               words.add(word);
+#           }
+#           return words;
+#       }
+#   }
+#
+#   // because the utility method readWords() is responsible for too many things, to test it
+#   //   we need to prepare a file for it to read and debug the code if the result is not what we expect
+#
+#   (good design: distribute the responsibilities to different objects)
+#
+# first, turn the utility method into a class
+#
+#   // a class that is responsible for both reading a file into a string and iterating over words of that string
+#   class Words implements Iterable<String> {
+#
+#       private final File file;
+#
+#       Words(File src) {
+#           this.file = src;
+#       }
+#
+#       @Override
+#       public Iterator<String> iterator() {
+#           String text = new String(Files.readAllBytes(Paths.get(this.file)), "UTF-8");
+#           Set<String> words = new HashSet<>();
+#           for (String word : text.split(" ")) {
+#               words.add(word);
+#           }
+#           return words.iterator();
+#       }
+#   }
+#
+# next, refactor the class and distribute its responsibilities to other objects
+#
+#   // a class that takes the responsibility of reading the file into a string
+#   class Text {
+#
+#       private final File file;
+#
+#       Text(File src) {
+#           this.file = src;
+#       }
+#
+#       @Override
+#       public String toString() {
+#           return new String(Files.readAllBytes(Paths.get(this.file)), "UTF-8");
+#       }
+#   }
+#
+#
+#   // another class that takes the responsibility of iterating the words of string
+#   class Words implements Iterable<String> {
+#
+#       private final String text;
+#
+#       Words(String txt) {
+#           this.text = txt;
+#       }
+#
+#       @Override
+#       public Iterator<String> iterator() {
+#           Set<String> words = new HashSet<>();
+#           for (String word : this.text.split(" ")) {
+#               words.add(word);
+#           }
+#           return words.iterator();
+#       }
+#   }
+#
+# now, the code is more testable and more reusable 
+# 
+#   // testing the Word's functionality does not need to prepare a file for it to read
+#   import org.junit.Test;
+#   import static org.hamcrest.MatcherAssert.*;
+#   import static org.hamcrest.Matchers.*;
+#
+#   public class WordsTest {
+#
+#       @Test
+#       public void parsesSimpleText() {
+#           assertThat(new Words("How are you?"), hasItems("How", "are", "you"));
+#       }
+#   }
+#

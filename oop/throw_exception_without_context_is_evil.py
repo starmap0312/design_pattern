@@ -10,10 +10,12 @@
 # 1) don't catch an exception without re-throwing it
 #    otherwise, you are hiding potentially important information, breaking the chain of trust between objects
 # 2) catch exceptions as seldom as possible
+# 3)throwing exceptions without proper context is bad
 #
 # example:
 #
-# (bad design)
+# (bad design: catch an exception without re-throwing it)
+#
 #   final class Wire {
 #
 #       private final OutputStream stream;
@@ -35,4 +37,50 @@
 #   new Wire(stream).send(1);
 #
 #   // the error information is hidden from the client
-#   //   we can't trust the object anymore, as we don't know what's going on if exception happens
+#   //   we can't trust the object anymore, as we don't know what's going on when exception happens
+#
+# example:
+#
+# (bad design: throw an exception without context)
+#
+# ex.
+#
+#   if (!file.exists()) {
+#       throw new IllegalArgumentException("File doesn't exist");
+#   }
+#
+# ex.
+#
+#   try {
+#       Files.delete(file);
+#   } catch (IOException ex) {
+#       throw new IllegalArgumentException(ex);
+#   }
+#
+# (good design: throw an exception with context/information)
+#
+#   ex.
+#   if (!file.exists()) {
+#       throw new IllegalArgumentException(
+#           String.format(
+#               "User profile file %s doesn't exist",
+#               file.getAbsolutePath()
+#           )
+#       );
+#   }
+#
+#   ex.
+#   try {
+#       Files.delete(file);
+#   } catch (IOException ex) {
+#       throw new IllegalArgumentException(
+#           String.format(
+#           "Can't delete user profile data file %s",
+#           file.getAbsolutePath()
+#           ),
+#           ex
+#       );
+#   }
+#
+#   // an exception message must describe the problem and show as much detail as possible
+#

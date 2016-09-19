@@ -1,10 +1,10 @@
 # Decorator pattern
-#
+#   one of the best ways to add features to an object without changing its interface
 #   make your code highly cohesive and loosely coupled
 #
-# example:
+# example: from simple to complex, by adding features to a class
 #
-#   // an interface for an object that is supposed to read a text somewhere and return it
+#   // an interface: read a text somewhere and return the read String
 #   interface Text {
 #       String read();
 #   }
@@ -12,10 +12,10 @@
 #   // an implementation that reads the text from a "file"
 #   final class TextInFile implements Text {
 #
-#       private final File file;
+#       private final File source;
 #
-#       public TextInFile(final File src) {
-#           this.file = src;
+#       public TextInFile(final File source) {
+#           this.source = source;
 #       }
 #
 #       @Override
@@ -26,24 +26,24 @@
 #       }
 #   }
 #
-#   // the decorator, also implementing Text, removes all unprintable characters from the text
+#   // a decorator class that removes all unprintable characters from the read String 
 #   final class PrintableText implements Text {
 #
-#       private final Text origin;
+#       private final Text source;
 #
 #       public PrintableText(final Text text) {
-#           this.origin = text;
+#           this.source = text;
 #       }
 #
 #       @Override
 #       public String read() {
-#           return this.origin.read()
+#           return this.source.read()
 #               .replaceAll("[^\p{Print}]", "");
 #       }
 #   }
 #   // PrintableText doesn't read the text from the file
-#   // it doesn't care where the text is coming from
-#   // it just delegates text reading to the encapsulated instance of Text
+#   //   it doesn't care where the read String is coming from
+#   //   it just delegates the reading to a Text object
 #
 #   // the client
 #   final Text text = new PrintableText(
@@ -51,18 +51,18 @@
 #   );
 #   String content = text.read();
 #
-#   // another decorator that capitalize all letters
+#   // another decorator class that capitalize all letters
 #   final class AllCapsText implements Text {
 #
-#       private final Text origin;
+#       private final Text source;
 #
 #       public AllCapsText(final Text text) {
-#           this.origin = text;
+#           this.source = text;
 #       }
 #
 #       @Override
 #       public String read() {
-#           return this.origin.read().toUpperCase(Locale.ENGLISH);
+#           return this.source.read().toUpperCase(Locale.ENGLISH);
 #       }
 #   }
 #
@@ -77,32 +77,36 @@
 #   String content = text.read();
 #
 #   // lazy execution: until method read() is called, the file is not touched and the processing of
-#   // the text is not started
-#   // the object text is just a composition of decorators, not an executable procedure
+#   //   the read String is not started
+#   // the client uses a composition of decorators, not an executable procedure
 #
-#   ex.
-#   (bad design)
-#     class String from Java defines more than 20 utility methods (should be decorators instead)
+# example: turn utility classes into decorators
 #
+#   (bad design: utility class)
+#
+#     // class String from Java defines more than 20 utility methods (should use decorators instead)
 #     final String txt = "hello, world!";
 #     final String[] parts = txt.trim().toUpperCase().split(" ");
 #
-#   (good design)
+#   (good design: decorators)
+#
 #     final String[] parts = new String.Split(
 #         new String.UpperCased(
 #             new String.Trimmed("hello, world!")
 #         )
 #     );
 #
-#  rule of thumb:
-#    1) avoid utility methods as much as possible: use decorators instead
-#    2) an ideal interface should contain only methods that you absolutely cannot remove
-#       everything else should be done through composable decorators         
+# rule of thumb:
+#   1) avoid utility methods as much as possible, and use decorators instead
+#   2) an ideal interface should contain only methods that you absolutely cannot remove
+#      everything else should be done through composable decorators         
+#
 #
 # vertical and horizontal decorating
 #
 # 1) vertical decorating
 #
+#    // a Numbers object knows how to traverse its numbers in order
 #    interface Numbers {
 #        Iterable<Integer> iterate();
 #    }
@@ -125,35 +129,39 @@
 #
 # 2) horizontal decorating
 #
+#    // a Numbers object knows how to traverse its numbers in order
 #    interface Numbers {
 #        Iterable<Integer> iterate();
 #    }
 #
+#    // a Diff object knows how to decorate an Iterable<Integer> object 
 #    interface Diff {
 #        Iterable<Integer> apply(Iterable<Integer> origin);
 #    }
 #
+#    // a decorator class that decorates a Number object's method by applying a list of Diff objects in sequence 
 #    final class Modified implements Numbers {
 #
-#       private final File file;
+#       private final File source;
 #
-#       public Modified(final Numbers src, Diff [] app) {
-#           this.file = src;
-#           this.apps = app;
+#       public Modified(final Numbers source, Diff [] decorators) {
+#           this.source = source;
+#           this.decorators = decorators;
 #       }
 #
 #       @Override
 #       public String iterate() {
-#           Iterable<Integer> rc = this.file.iterate();
-#           for(app : apps) {
-#               rc = app.apply(rc);
+#           Iterable<Integer> iterable = this.source.iterate();
+#           for(decorator : decorators) {
+#               iterable = decorator.apply(iterable);
 #           }
-#           return rc;
+#           return iterable;
 #       }
 #
 #    }
 #
-#    // implements the core functionality of iterating numbers through instances of Positive, Odds, Unique, and Sorted
+#    // implements the core functionality of iterating numbers through instances of Positive, Odds,
+#    //   Unique, and Sorted
 #    Numbers numbers = new Modified(
 #        new ArrayNumbers(
 #            new Integer[] {

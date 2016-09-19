@@ -1,6 +1,6 @@
 # defensive programming via validating decorators
-#   ex. used for validating the input parameters of a method
-# benefits: make the classes small and cohesive, and more reusable
+#   used for validating the input parameters of a method
+#   benefits: make the classes small and cohesive, and more reusable
 #
 # example:
 #
@@ -20,7 +20,7 @@
 #
 #  }
 #  
-#  (good desing: use validating decorators)
+#  (good desing: distribute responsibilities to validating decorators)
 #  // the core object will do the reporting, while the decorators will validate parameters
 #  
 #  interface Report {
@@ -59,5 +59,4 @@
 #  // the client code that uses decorators
 #  Report report = new NoNullReport(new NoWriteOverReport(new DefaultReport()));
 #  report.export(file);
-#  
 #  
