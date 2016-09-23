@@ -1,6 +1,12 @@
 from abc import ABCMeta, abstractmethod
+from abc import ABC, ABCMeta, abstractmethod
 
-class Abstract(metaclass=ABCMeta):
+
+# (Python2)
+# class Abstract(metaclass=ABCMeta):
+
+# (Python3)
+class Abstract(ABC):
 
     @abstractmethod
     def read(self):

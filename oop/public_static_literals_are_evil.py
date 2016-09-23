@@ -33,6 +33,8 @@
 #     // ex1. the client code: to convert a byte array into a String
 #     String text = new UTF8String(array);  ==> create a new class/object that provides the service
 #                                               encapsulate the "UTF-8" constant inside that class
+#     // as Java makes class String final, in reality we will have to write this:
+#     String text = new UTF8String(array).toString();
 #
 #     why is it good?
 #     a) encapsulate the "UTF-8" constant inside the new class UTF8String
