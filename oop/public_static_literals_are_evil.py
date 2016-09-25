@@ -26,7 +26,7 @@
 #     1) once you use CharEncoding.UTF_8, your object starts to depend on this data
 #        the user of your object can't break this dependency
 #     2) placing data into one shared place (CharEncoding.UTF_8) doesn't really solve the duplication problem
-#        it encourages everyone to duplicate functionality using/depending same piece of shared/constant data
+#        it encourages everyone to duplicate functionality using the piece of constant data
 #
 #     (good design: encapsulate the public constant inside a new class that provides the same service)
 #
