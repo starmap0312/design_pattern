@@ -2,6 +2,8 @@
 #   one of the best ways to add features to an object without changing its interface
 #   make your code highly cohesive and loosely coupled
 #
+# (Composable Decorators vs. Imperative Utility Methods)
+#
 # example: from simple to complex, by adding features to a class
 #
 #   // an interface: read a text somewhere and return the read String

@@ -5,12 +5,13 @@
 #   patterns
 # - 4 major roles of command pattern:
 #   a) the receiver object: a service object with operations that actually do the work
-#   b) the command object: knows about how to invokes a receiver's operation
+#                           all service objects are adapted to command interface
+#   b) the command object: knows about how to invokes a receiver's operation (implement a uniform interface)
 #      (i.e. knows about some subset of the following: the receiver object, one of its operation,
 #       and the parameters of the operation)
 #   c) the invoker object: knows about how to use a command object (with optional bookkeeping)
-#   d) the client object: constructs and uses the invoker object and injects command objects
-#      into the invoker object
+#   d) the client object: constructs and uses the invoker object to run the command objects
+#                         by injecting command objects into the invoker object
 #
 #                        (HAS_A)               (HAS_A)
 #             Client ----------------> Invoker ------> Command
