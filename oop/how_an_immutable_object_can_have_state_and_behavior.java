@@ -123,14 +123,16 @@ class Document {
             && Document.class.cast(doc).id == this.id;
     }
 }
-// the Storage object should be a data animator, not just holding data (because object is alive)
-// the Document object needs extra knowledge in order to gain access to the data
-//   ex. a database unique key, an HTTP address, a file name, or a storage address
 
-// the interface: both readTitle() and saveTitle are the object's behaviors, not getter/setter methods
+// the interface: both readTitle() and saveTitle are the object's behaviors
 interface Document {
 
     String readTitle();
     void saveTitle(String text);
 }
 
+// the Storage object should be a data animator, not just holding data (because object is alive)
+// the Document object needs extra knowledge in order to gain access to the data
+//   ex. a database unique key, an HTTP address, a file name, or a storage address
+// the Document object is collaborating with other object for accessing the title
+//   not using getter/setter methods to change its internal state

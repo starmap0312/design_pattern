@@ -6,7 +6,7 @@
 #   which implementation of the objects to be instantiated
 # - factory method is not necessary when instances never change
 # - the factory method is often used with the template pattern:
-#   a) superclass specifies generic the uses of the object and delegates the creation details to 
+#   a) superclass specifies generic uses of the object and delegates the creation details to 
 #      the subclasses
 #   b) the superclass does not directly depend on the created objects, i.e. the superclass and 
 #      the created objects are "loosely coupled"
