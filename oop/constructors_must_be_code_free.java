@@ -78,7 +78,9 @@ public final class CachedName implements Name {
 
 // the client code
 final Name name = new CachedName(
-    new EnglishName(new NameInPostgreSQL(/*...*/))
+    new EnglishName(
+        new NameInPostgreSQL(/*...*/)
+    )
 );
 
 // we split the object into two parts

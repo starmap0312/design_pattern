@@ -263,7 +263,13 @@
 #  }
 #  
 #  // the final client code
-#  Page page = new NeverEmptyPage(new OncePage(new DefaultPage("http://www.google.com")))
+#  Page page = new NeverEmptyPage(
+#      new OncePage(
+#          new DefaultPage(
+#              "http://www.google.com"
+#          )
+#      )
+#  )
 #  String html = new AlwaysTextPage(new TextPage(page, "ISO_8859_1"), page).html();
 #  
 
