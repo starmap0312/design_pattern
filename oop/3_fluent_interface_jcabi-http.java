@@ -52,7 +52,7 @@ String html = new JdkRequest("https://www.google.com")
     .header("Accept", "text/html")
     .fetch()                                  // fetch the data from the URL
     .as(RestResponse.class)                   
-    .assertStatus(HttpURLConnection.HTTP_OK)// fetch() is decorated by RestResponse.class
+    .assertStatus(HttpURLConnection.HTTP_OK)  // fetch() is decorated by RestResponse.class
     .body();
 
 // ex2. fetch JSON data and retrieve a value 
