@@ -2,7 +2,7 @@
 #   there should not be any "configurations" in OOP, ex. Spring XML configuration mechanisms
 #   using object properties as configuration parameters is a very common mistake
 #   this makes objects implicitly mutable: we configure them
-#     we "change their behavior" by injecting parameters or a entire setting/configuration object into them
+#     we "change their behavior" by injecting parameters or an entire setting/configuration object into them
 #   encapsulated properties must not be used to change the behavior of an object
 #     an object's properties are its inherent characteristics (in order to represent a real-world entity)
 #     an object's behavior should be immutable
@@ -262,7 +262,7 @@
 #      }
 #  }
 #  
-#  // the final client code
+#  // the final client code: create a multi-decorated page and then get its html content
 #  Page page = new NeverEmptyPage(
 #      new OncePage(
 #          new DefaultPage(
