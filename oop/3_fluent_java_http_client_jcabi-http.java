@@ -50,7 +50,7 @@ String html = new JdkRequest("https://www.google.com")
     .uri().path("/users").queryParam("id", 333).back()
     .method(Request.GET)
     .header("Accept", "text/html")
-    .fetch()                                  // fetch the data from the URL
+    .fetch()                                  // fetch the response from the URL
     .as(RestResponse.class)                   
     .assertStatus(HttpURLConnection.HTTP_OK)  // fetch() is decorated by RestResponse.class
     .body();
@@ -58,7 +58,7 @@ String html = new JdkRequest("https://www.google.com")
 // ex2. fetch JSON data and retrieve a value 
 String rate = new JdkRequest("http://www.getexchangerates.com/api/latest.json")
     .header("Accept", "application/json")
-    .fetch()                                  // fetch the data from the URL
+    .fetch()                                  // fetch the response from the URL
     .as(JsonResponse.class)                   // fetch() is decorated by JsonResponse
     .json().readArray().getJsonObject(0)      // the decorator adds a json() method which returns JsonObject 
     .getString("EUR");
@@ -66,7 +66,7 @@ String rate = new JdkRequest("http://www.getexchangerates.com/api/latest.json")
 // ex3. fetch XML data and retrieve a string value from its element
 String name = new JdkRequest("http://my-api.example.com")
     .header("Accept", "text/xml")
-    .fetch()                                  // fetch the data from the URL
+    .fetch()                                  // fetch the response from the URL
     .as(XmlResponse.class)                    // fetch() is decorated by XmlResponse
     .xml().xpath("/root/name/text()").get(0); // the decorator adds an xml() method which returns an XmlObject
 

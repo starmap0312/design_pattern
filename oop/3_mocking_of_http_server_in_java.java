@@ -1,4 +1,5 @@
-// mocking http server for unit and integration testing of your HTTP clients
+// Mocking of HTTP Server in Java
+//   mocking http server for unit and integration testing of your HTTP clients
 //
 // example: Jcabi server component
 

@@ -85,7 +85,7 @@ void transform(File in, File out) {
 //      declarative: enables lazy execution, i.e. the file is not read until its data is required
 //        the whole task starts only after we call addAll()
 
-// example: a utility method readWords() for reading words from a file
+// another example: a utility method readWords() for reading words from a file
 //
 // (bad design)
 
