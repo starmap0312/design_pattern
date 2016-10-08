@@ -138,7 +138,7 @@ public interface Repo extends JsonReadable, JsonPatchable, Comparable<Repo> {
      */
     Issues issues();
 
-    final class Smart implements Repo { // a decorator class
+    final class Smart implements Repo { // a decorator class, providing additional info about the repo
         /*
          * Encapsulated Repo.
          */
@@ -153,7 +153,7 @@ public interface Repo extends JsonReadable, JsonPatchable, Comparable<Repo> {
          */
         public Smart(final Repo rep) {
             this.repo = rep;
-            this.jsn = new SmartJson(rep);
+            this.jsn = new SmartJson(rep);       // use SmartJson to read additional field
         }
         /*
          * Get its description.
@@ -161,7 +161,7 @@ public interface Repo extends JsonReadable, JsonPatchable, Comparable<Repo> {
          * @throws IOException If there is any I/O problem
          */
         public String description() throws IOException {
-            return this.jsn.text("description");
+            return this.jsn.text("description"); // read the description field
         }
         public Github github() {
             return this.repo.github();
@@ -172,7 +172,7 @@ public interface Repo extends JsonReadable, JsonPatchable, Comparable<Repo> {
         public Issues issues() {
             return this.repo.issues();
         }
-        public JsonObject json() throws IOException {
+        public JsonObjectjson() throws IOException {
             return this.repo.json();
         }
     }
@@ -421,6 +421,9 @@ public interface Issue extends Comparable<Issue>, JsonReadable, JsonPatchable {
      */
     Comments comments();
 
+   /*
+    * Use a supplementary "smart" decorator to get other properties from an issue
+    */
     final class Smart implements Issue { // a docorator of Issue object to provide information of the issue
         /*
          * Encapsulated issue.
@@ -590,3 +593,122 @@ final class RtIssue implements Issue {
         return new RtJson(this.request).fetch();
     }
 }
+
+public interface JsonReadable {
+
+    /*
+     * Describe it in a JSON object.
+     * @return JSON object
+     */
+    JsonObject json() throws IOException;
+}
+
+/*
+ * Smart JSON (supplementary help class).
+ * ex.
+ *   new SmartJson({"first": "a"}).text("first")                    // JsonString.class
+ *   new SmartJson({"second": 1}).number("second")                 // JsonNumber.class
+ *   new SmartJson({"arr": [1, 2]})).value("arr", JsonArray.class) // JsonArray.class
+ *   new SmartJson({"o": {"foo": [1]}})).value("o", JsonObject.class).getJsonArray("foo") // JsonObject.class
+ */
+
+final class SmartJson {
+
+    /*
+     * Encapsulated JSON object.
+     */
+    private final transient JsonReadable object;
+
+    /*
+     * Public ctor.
+     * @param obj Readable object
+     */
+    SmartJson(final JsonReadable obj) { // any JsonReadable object can be decorated, i.e. any object with json() method
+        this.object = obj;
+    }
+
+    /*
+     * Get its property as string.
+     * @param name Name of the property
+     * @return Value
+     * @throws IOException If there is any I/O problem
+     */
+    public String text(final String name) throws IOException {
+        return this.value(name, JsonString.class).getString();
+    }
+
+    /*
+     * Get its property as number.
+     * @param name Name of the property
+     * @return Value
+     * @throws IOException If there is any I/O problem
+     */
+    public int number(final String name) throws IOException {
+        return this.value(name, JsonNumber.class).intValue();
+    }
+
+    /*
+     * Get JSON.
+     * @return JSON
+     */
+    public JsonObject json() throws IOException {
+        return this.object.json();
+    }
+
+    /*
+     * Get its property as custom type.
+     * @param name Name of the property
+     * @param type Type of result expected
+     * @return Value
+     * @param <T> Type expected
+     */
+    public <T> T value(final String name, final Class<T> type) throws IOException {
+        final JsonObject json = this.json();
+        if (!json.containsKey(name)) {
+            throw new IllegalStateException(
+                String.format("'%s' is absent in JSON: %s", name, json)
+            );
+        }
+        final JsonValue value = json.get(name);
+        if (value == null) {
+            throw new IllegalStateException(
+                String.format("'%s' is NULL in %s", name, json)
+            );
+        }
+        if (value.getClass().isAssignableFrom(type)) {
+            throw new IllegalStateException(
+                String.format("'%s' is not of type %s", name, type)
+            );
+        }
+        return type.cast(value);
+    }
+}
+
+
+// the main function for using jcabi-github
+public class Main {
+
+    public static void main(String[] args) throws IOException {
+        Github github = new RtGithub(".. your OAuth token ..");                       // instantiate Github object
+        Repo repo = github.repos().get(new Coordinates.Simple("jcabi/jcabi-github")); // get Repos & Repo objects
+        Issue issue = repo.issues().create("How are you?", "Please tell me...");      // get Issues & create issue
+        issue.comments().post("My first comment!");                                   // post a comment to a issue
+    }
+}
+
+// the test code
+public class FooTest {
+
+    public void submitsCommentToGithubIssue() {
+        final Repo repo = new MkGithub().repos().create(              // create a Repo object
+            Json.createObjectBuilder().add("name", "test").build()    // build a JsonObject
+        );
+        final Issue issue = repo.issues().create("how are you?", ""); // create a Issue object
+        new Foo(issue).doSomething();                                 // expected to post a message to the issue
+        MasterAssert.assertThat(                                      // assert that there is at least one comment
+            issue.comments().iterate(),
+            Matchers.iterableWithSize(1)
+        );
+    }
+}
+ 

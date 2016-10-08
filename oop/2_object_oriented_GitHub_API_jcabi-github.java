@@ -1,4 +1,4 @@
-// Object-Oriented GitHub API
+// Object-Oriented GitHub API: jcabi-github
 //   GitHub gives access to almost all of its features through RESTful JSON API
 //   but its Java SDK has the following issues:
 //   1) not really object-oriented

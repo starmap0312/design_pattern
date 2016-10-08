@@ -28,60 +28,57 @@ public interface Request {
 
 final class BaseRequest implements Request {
 
-    private static final String ENCODING = "UTF-8";
+    private static final String ENCODING = "UTF-8"; // define a constant string for the class
+    private final transient byte[] content;
 
     // Public ctor.
     // @param uri The resource to work with
     // @param method HTTP method
     // @param cnct Connect timeout for http connection
     // @param rdd Read timeout for http connection
-    BaseRequest(final String uri, final String method, final int cnct, final int rdd) {
+    BaseRequest(final String uri, final String method, final byte[] body, final int cnct, final int rdd) {
         URI addr = URI.create(uri);
         if (addr.getPath().isEmpty()) {
             addr = UriBuilder.fromUri(addr).path("/").build();
         }
         this.home = addr.toString();
         this.mtd = method;
+        this.content = body.clone();
         this.connect = cnct;
         this.read = rdd;
     }
 
-    @Override
-    public Request method(final String method) {
-        return new BaseRequest(
-            this.home,
-            method,
-            0,
-            0
-        );
+    public Request method(final String method) { // return New alternated request
+        return new BaseRequest(this.home, method, 0, 0);
     }
 
-    public Request timeout(final int cnct, final int rdd) {
-        return new BaseRequest(
-            this.home,
-            this.mtd,
-            cnct,
-            rdd
-        );
+    public Request timeout(final int cnct, final int rdd) { // return New alternated request
+        return new BaseRequest(this.home, this.mtd, cnct, rdd);
     }
 
     public Response fetch() throws IOException {
         return this.fetchResponse(new ByteArrayInputStream(this.content));
     }
 
-
-    // Fetch response from server.
-    // @return The obtained response
-    // @throws IOException If an IO exception occurs.
-    private Response fetchResponse() throws IOException {
+    /*
+     * Fetch response from server.
+     * @param stream The content to send.
+     * @return The obtained response
+     * @throws IOException If an IO exception occurs.
+     */
+    private Response fetchResponse(final InputStream stream) throws IOException {
         final long start = System.currentTimeMillis();
-        final Response response = Wire().send(this.home, this.mtd, this.connect, this.read);
+        final Response response = this.wire.send(
+            this, this.home, this.mtd,
+            this.hdrs, stream, this.connect,
+            this.read
+        );
         final URI uri = URI.create(this.home);
         return response;
     }
 
     public Response fetch() throws IOException {
-        return this.fetchResponse();
+        return this.fetchResponse(new ByteArrayInputStream(this.content));
     }
 }
 
