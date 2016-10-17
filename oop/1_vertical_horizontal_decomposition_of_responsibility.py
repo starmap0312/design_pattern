@@ -18,6 +18,10 @@ class Log(object):
         self.file.write(line)
 
 # (good design: after horizontal decomposition)
+#   horizontally decomposition increases complexity as client has more dependencies and points of contact
+#
+#   class Script --> class Log
+#                --> class Line
 #
 # the class is responsible for only writing the line to a file
 class Log(object):
@@ -37,21 +41,20 @@ class Line(object):
     def __str__(self):
         return datetime.datetime.now().strftime("%B %d, %Y: ") + self.line
 
-# the client class: need to know both classes Log and Line to provide its service
+# the client class: need to know both classes (collaborators), i.e. class Log and class Line, to provide its service
 class Script(object):
 
     def write(self, text, filepath):
+        line = Line(text)
         log = Log(filepath)
-        log.put(Line(text))
+        log.put(line)
 
 script = Script().write('Message\n', '/tmp/log.txt')
 
-# horizontally decomposition increases complexity as client has more dependencies and points of contact
-#
-#   class Script --> class Log
-#                --> class Line
-#
 # (better design: after vertical decomposition)
+#   vertical decomposition decreases complexity
+#
+#   class Script --> class TimedLog --> class Log
 #
 # the class is responsible for only writing the line to a file (no change)
 class Log(object):
@@ -62,7 +65,7 @@ class Log(object):
     def put(self, line):
         self.file.write(str(line))
 
-# a decorator class responsible for decorating the Log put() method
+# a decorator class responsible for decorating the Log put() method by adding time format
 class TimedLog(object):
 
     def __init__(self, log):
@@ -80,8 +83,4 @@ class Script(object):
         log.put(text)
 
 script = Script().write('Message\n', Log('/tmp/log.txt'))
-
-# vertical decomposition decreases complexity
-#
-#   class Script --> class TimedLog --> class Log
 
