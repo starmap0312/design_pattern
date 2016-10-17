@@ -1,4 +1,4 @@
-# in most cases, if-then-else must be replaced by a decorator or simply another object
+# in most cases, if-then-else (switch statements) must be replaced by a decorator or simply another object
 #
 # example: 
 #

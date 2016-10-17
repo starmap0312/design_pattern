@@ -5,7 +5,7 @@
 // (Composable Decorators vs. Imperative Utility Methods)
 //
 // example: from simple to complex, by adding features to a class
-
+//
 // an interface: read a text somewhere and return the read String
 interface Text {
     String read();
@@ -39,8 +39,7 @@ final class PrintableText implements Text {
 
     @Override
     public String read() {
-        return this.source.read()
-            .replaceAll("[^\p{Print}]", "");
+        return this.source.read().replaceAll("[^\p{Print}]", "");
     }
 }
 // PrintableText doesn't read the text from the file
@@ -106,13 +105,13 @@ final String[] parts = new String.Split(
 
 // vertical and horizontal decorating
 //
-// example:
+// another example:
 
 // 1) vertical decorating
 //
 // a Numbers object knows how to traverse its numbers in order
 interface Numbers {
-    Iterable<Integer> iterate();
+    Iterable<Integer> iterate(); // the iterate() method returns an iterable object (i.e. object with an iterator() method)
 }
 
 // the client code
@@ -129,62 +128,105 @@ Numbers numbers = new Sorted(
         )
     )
 );
+// Sorted, Unique, Odds, etc. work as indivisual vertical decorators
+//   they takes the Numbers object as an argument of its constructor and decorates its iterate() method
 
-numbers.iterate();
+class Positive implements Numbers {
 
+   private final Numbers source;
+
+   public Positive(final Numbers source) {
+       this.source = source;
+   }
+
+   @Override
+   public Iterable<Integer> iterate() {
+       List<Integer> rc = new ArrayList<>();
+       Iterable<Integer> iterable = this.source.iterate();
+       for (Integer num : iterable) {
+           if (i > 0) {
+               rc.add(num);
+           }
+       }
+       return rc;
+   }
+}
+
+Iterable<Integer> iterable = numbers.iterate();
+// the Numbers object are decorated by overriding its iterate() method 
+//   it then returns an iterable object for traversing sorted, odd, and positive integers of the original Numbers object 
+//
 // 2) horizontal decorating
-
+//
 // a Numbers object knows how to traverse its numbers in order
 interface Numbers {
     Iterable<Integer> iterate();
 }
 
-// a Diff object knows how to decorate an Iterable<Integer> object 
-interface Diff {
+// a Modifier object knows how to decorate an Iterable<Integer> object 
+interface Modifier {
     Iterable<Integer> apply(Iterable<Integer> origin);
 }
+// the modifier apply the iterable object 
 
-// a decorator class that decorates a Number object's method by applying a list of Diff objects in sequence 
-final class Modified implements Numbers {
+// a decorator class that override Number object's iterate() method by applying a list of modifiers in sequence 
+final class HorizontalDecorator implements Numbers {
 
-   private final File source;
+   private final Numbers source;
 
-   public Modified(final Numbers source, Diff [] decorators) {
+   public HorizontalDecorator(final Numbers source, Modifier [] modifiers) {
        this.source = source;
-       this.decorators = decorators;
+       this.modifiers = modifiers;
    }
 
    @Override
-   public String iterate() {
+   public Iterable<Integer> iterate() {
        Iterable<Integer> iterable = this.source.iterate();
-       for(decorator : decorators) {
-           iterable = decorator.apply(iterable);
+       for(modifier : modifiers) {
+           iterable = modifier.apply(iterable);
        }
        return iterable;
    }
 
 }
 
+class Positive {
+
+   public Iterable<Integer> apply(Iterable<Integer> itr) {
+       List<Integer> rc = new ArrayList<>();
+       Iterable<Integer> iterable = itr.iterate();
+       for (Integer num : iterable) {
+           if (i > 0) {
+               rc.add(num);
+           }
+       }
+       return rc;
+   }
+}
+
 // the client code
-Numbers numbers = new Modified(
+Numbers numbers = new HorizontalDecorator(
     new ArrayNumbers(
         new Integer[] {
             -1, 78, 4, -34, 98, 4,
         }
     ),
-    new Diff[] {
+    new Modifier[] {
         new Positive(),
         new Odds(),
         new Unique(),
         new Sorted()
     }
 );
+// Sorted, Unique, Odds, etc. work as vertical decorators (modifiers)
+//   they takes the Numbers object as an argument of its method and apply its iterate() method's return object
+// HorizontalDecorator decorates the iterate() method by applying the vertical decorators (modifiers) in sequence
 
-numbers.iterate();
+Iterable<Integer> iterable = numbers.iterate();
 
 // in vertical decorating, the decorator classes Positive, Odds, etc. implement the Numbers interface
-//   they decorate the original object's iterate() method in their own iterate() method
-// in horizontal decorating, the decorator classes Positive, Odds, etc. implement a different Diff interface
-//   they work together as a composite decorator, i.e. Modified object, to decorate the original object's
-//   iterate() method in the composite decorator's iterate() method 
+//   they override (decorate) the iterate() method
+// in horizontal decorating, classes Positive, Odds, etc. convert the iterable object returned by the iterate() method
+//   a wrapper class, HorizontalDecorator, applies the apply one by one and returns it in its iterate() method
+
 

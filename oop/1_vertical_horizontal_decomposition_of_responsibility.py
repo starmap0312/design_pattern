@@ -8,7 +8,7 @@ import datetime
 # (bad design: before decomposition)
 #
 # a class responsible for two things: formatting the text and writing the formated text to a file
-class Log(object):
+class FileTimedLog(object):
 
     def __init__(self, path):
         self.file = open(path, 'a')
@@ -17,6 +17,11 @@ class Log(object):
         line = datetime.datetime.now().strftime("%B %d, %Y: ") + text
         self.file.write(line)
 
+FileTimedLog('/tmp/log.txt').put('Message\n')
+
+# why is it bad?
+#   not re-usable and extensible
+#
 # (good design: after horizontal decomposition)
 #   horizontally decomposition increases complexity as client has more dependencies and points of contact
 #
@@ -24,7 +29,7 @@ class Log(object):
 #                --> class Line
 #
 # the class is responsible for only writing the line to a file
-class Log(object):
+class FileLog(object):
 
     def __init__(self, path):
         self.file = open(path, 'a')
@@ -33,7 +38,7 @@ class Log(object):
         self.file.write(str(line))
 
 # an additional class that is responsible for formatting the text
-class Line(object):
+class TimedLine(object):
 
     def __init__(self, text):
         self.line = text
@@ -45,19 +50,23 @@ class Line(object):
 class Script(object):
 
     def write(self, text, filepath):
-        line = Line(text)
-        log = Log(filepath)
+        line = TimedLine(text)
+        log = FileLog(filepath)
         log.put(line)
 
 script = Script().write('Message\n', '/tmp/log.txt')
 
+# why is it not good enough?
+#   the Scirpt class depends on two collaborators, i.e. class TimedLine and class FileLog
+#
+#
 # (better design: after vertical decomposition)
 #   vertical decomposition decreases complexity
 #
 #   class Script --> class TimedLog --> class Log
 #
 # the class is responsible for only writing the line to a file (no change)
-class Log(object):
+class FileLog(object):
 
     def __init__(self, path):
         self.file = open(path, 'a')
@@ -65,7 +74,7 @@ class Log(object):
     def put(self, line):
         self.file.write(str(line))
 
-# a decorator class responsible for decorating the Log put() method by adding time format
+# a decorator class that decorates Log's put() method by prepending the current time string
 class TimedLog(object):
 
     def __init__(self, log):
@@ -82,5 +91,8 @@ class Script(object):
         log = TimedLog(log)
         log.put(text)
 
-script = Script().write('Message\n', Log('/tmp/log.txt'))
+script = Script().write('Message\n', FileLog('/tmp/log.txt'))
 
+# why is it good?
+#   the reponsibilities are well separated, so it is easier to reuse and extend
+#   the client class depends on one class, i.e. class TimedLog, one single entry point
