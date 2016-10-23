@@ -1,6 +1,4 @@
-from abc import ABCMeta, abstractmethod
 from abc import ABC, ABCMeta, abstractmethod
-
 
 # (Python2)
 # class Abstract(metaclass=ABCMeta):
