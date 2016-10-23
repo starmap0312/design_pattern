@@ -41,13 +41,20 @@ reader = NoDashLine(Stripped(CommandReader(cmd)))
 for line in reader.iterate():
     print(line)
 
-class CommandIterable(object):
-
-    def __init__(self, cmd):
-        self.process = subprocess.Popen([cmd], stdout=subprocess.PIPE, shell=True)
+class Iterable(object):
+    __metaclass__ = ABCMeta
 
     def __iter__(self):
         return self
+
+    @abstractmethod
+    def next(self):
+        pass
+
+class CommandIterable(Iterable):
+
+    def __init__(self, cmd):
+        self.process = subprocess.Popen([cmd], stdout=subprocess.PIPE, shell=True)
 
     def next(self):
         line = self.process.stdout.readline()
@@ -55,24 +62,18 @@ class CommandIterable(object):
             raise StopIteration()
         return line
 
-class Stripped(object):
+class Stripped(Iterable):
 
     def __init__(self, iterable):
         self.iterable = iterable
-
-    def __iter__(self):
-        return self
 
     def next(self):
         return self.iterable.next().strip()
 
-class NoDashLine(object):
+class NoDashLine(Iterable):
 
     def __init__(self, iterable):
         self.iterable = iterable
-
-    def __iter__(self):
-        return self
 
     def next(self):
         line = self.iterable.next()
