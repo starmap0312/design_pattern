@@ -3,7 +3,7 @@ from abc import ABCMeta, abstractmethod
 
 cmd = 'echo Line1; echo ----; echo Line2; echo ----; echo Line3'
 
-# Method 1: decorating readers
+# Method 1: decorating iterable client 
 class Reader(object):
     __metaclass__ = ABCMeta
 
@@ -18,7 +18,7 @@ class CommandReader(Reader):
 
     def iterate(self):
         process = subprocess.Popen([cmd], stdout=subprocess.PIPE, shell=True)
-        return [line for line in process.stdout.readlines()]
+        return process.stdout.readlines()
 
 class Stripped(Reader):
 
@@ -36,10 +36,12 @@ class NoDashLine(Reader):
     def iterate(self):
         return [line for line in self.source.iterate() if not line.startswith('--')]
 
-print('Method 1: decorating readers')
+print('Method 1: decorating iterable clients')
 reader = NoDashLine(Stripped(CommandReader(cmd)))
 for line in reader.iterate():
     print(line)
+
+#####################################################
 
 class Iterable(object):
     __metaclass__ = ABCMeta
