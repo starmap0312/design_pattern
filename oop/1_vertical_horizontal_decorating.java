@@ -144,7 +144,7 @@ class Positive implements Numbers {
        List<Integer> rc = new ArrayList<>();
        Iterable<Integer> iterable = this.source.iterate();
        for (Integer num : iterable) {
-           if (i > 0) {
+           if (num > 0) {
                rc.add(num);
            }
        }
@@ -196,7 +196,7 @@ class Positive {
        List<Integer> rc = new ArrayList<>();
        Iterable<Integer> iterable = itr.iterate();
        for (Integer num : iterable) {
-           if (i > 0) {
+           if (num > 0) {
                rc.add(num);
            }
        }
