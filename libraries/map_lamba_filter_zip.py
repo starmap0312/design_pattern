@@ -1,19 +1,19 @@
 print("1) map():")
-# 1) map(function, iterable):
+# 1) map(function, iterable): return a iterable, i.e. map to another iterable
 def func(arg):
-    return arg
+    return int(arg)
 
 # map() returns an iterator: with which you can iterate over the result of func applied with each of the iterable
 # in Python2, map() returns a list, therefore, it is similar to executing the following statement
 #     [ func(alist[i]) for i in alist ]  ==> map(func, alist)
 
-for i in map(func, [1, 2, 3]):
+for i in map(func, ["1", "2", "3"]):
     print(i)
 
-print(list(map(func, [4, 5, 6])))
+print(list(map(func, ["1", "2", "3"])))
 
 print("2) lambda:")
-# 2) lambda:
+# 2) lambda arg1, arg2: return expression (defines an anonymous function object)
 #
 sum = lambda x, y: x + y
 print("sum={}".format(sum(3, 4)))
@@ -30,10 +30,11 @@ alist = [1,2,3,4]
 blist = [5,6,7,8]
 print(list(map(lambda x, y: x + y, alist, blist)))
 
-# 4) filter(function, iterable):
+# 4) filter(function, iterable): return a iterable, i.e. filter out elements if passed-in function return False 
 # filter out all the elements of a iterable, for which the function returns True
 fibonacci = [ 0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55 ]
 odd_numbers = list(filter(lambda x: x % 2, fibonacci))
+print("4) filter()")
 print(odd_numbers)
 
 # 5) enumerate(iterable):

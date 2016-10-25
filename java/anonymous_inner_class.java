@@ -37,3 +37,21 @@ public static void main(String[] args) {
     System.out.println(multiplier.calculate(10, 20));
 }
 // we don't really name the subclass, but instantiate its object once and use
+//
+// example3: instantiate an anonymous subclass of an interface
+
+interface HelloWorld {
+    public void greet();
+    public void greetSomeone(String someone);
+}
+
+HelloWorld frenchGreeting = new HelloWorld() {
+
+    public void greet() {
+        greetSomeone("world");
+    }
+
+    public void greetSomeone(String name {
+        System.out.println("Hello " + name);
+    }
+};
