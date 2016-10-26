@@ -1,5 +1,6 @@
 import smtplib
 from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from abc import ABCMeta, abstractmethod
 
 class Stamp(object):
@@ -23,6 +24,20 @@ class Wire(object):
     def connect(self):
         pass
 
+class Envelope(object):
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
+    def unwrap(self):
+        pass
+
+class Address(object):
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
+    def to_string(self):
+        pass
+
 class SMTP(Wire):
 
     def __init__(self, server):
@@ -31,7 +46,7 @@ class SMTP(Wire):
     def connect(self):
         return smtplib.SMTP(self.server)
 
-class Address(object):
+class InternetAddress(Address):
 
     def __init__(self, name, address):
         self.name = name
@@ -80,7 +95,7 @@ class StSubject(Stamp):
     def attach(self, msg):
         msg['Subject'] = self.subject
 
-class Envelope(object):
+class DefaultEnvelope(Envelope):
 
     def __init__(self, stamps, enclosures):
         self.stamps = stamps
@@ -105,17 +120,17 @@ class Postman(object):
         smtp.sendmail(msg['From'], msg['To'], msg.as_string())
 
 if __name__ == '__main__':
-    postman = Postman(SMTP('relayserver.example.com'))
+    postman = Postman(SMTP('example.relay.com'))
     postman.send(
-        Envelope(
+        DefaultEnvelope(
             [
-                StSender("Kuan-Yu", "kuanyu@yahoo-inc.com"),
-                StRecepient("Kuan-Yu", "kuanyu@yahoo-inc.com"),
+                StSender(InternetAddress("Kuan-Yu", "kuanyu@yahoo-inc.com")),
+                StRecipient(InternetAddress("Kuan-Yu", "kuanyu@yahoo-inc.com")),
                 StSubject("subject")
             ],
             [
                 EnPlain("plain text"),
-                EnPlain("<html><p>html text</p></html>")
+                EnHTML("<html><p>html text</p></html>")
             ]
         )
     )
