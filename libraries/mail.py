@@ -1,16 +1,27 @@
 import smtplib, subprocess
+from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-SENDER = "sender@example.com"
-RECEIVER = "receiver@example.com"
+SENDER = "Sender Name <sender@example.com>"
+RECIPIENT = "Recipient Name <receiver@example.com>"
+SUBJECT = "subject"
+PLAIN_CONTENT = "plain text"
+HTML_CONTENT = "<html><p>html text</p></html>"
+SERVER = "relayserver.example.com"
 
 # configure the message
-msg = MIMEText("<body>content</body>", 'html')
-msg['Subject'] = "title"
+msg = MIMEMultipart('alternative')
+msg['Subject'] = SUBJECT
 msg['From'] = SENDER
-msg['To'] = RECEIVER
+msg['To'] = RECIPIENT # can be a list of addresses
+
+# attach parts of two MIME types: text/plain and text/html
+part1 = MIMEText(PLAIN_CONTENT, 'plain')
+part2 = MIMEText(HTML_CONTENT, 'html')
+msg.attach(part1)
+msg.attach(part2)
 
 # send the mail
-client = smtplib.SMTP("relayserver.example.com")
-client.sendmail(SENDER, [RECEIVER], msg.as_string())
-client.quit()
+smtp = smtplib.SMTP(SEVER)
+smtp.sendmail(msg['From'], msg['To'], msg.as_string())
+smtp.quit()
