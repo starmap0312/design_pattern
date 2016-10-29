@@ -31,13 +31,6 @@ class Envelope(object):
     def unwrap(self):
         pass
 
-class Address(object):
-    __metaclass__ = ABCMeta
-
-    @abstractmethod
-    def to_string(self):
-        pass
-
 class SMTP(Wire):
 
     def __init__(self, server):
@@ -46,14 +39,14 @@ class SMTP(Wire):
     def connect(self):
         return smtplib.SMTP(self.server)
 
-class InternetAddress(Address):
+class Address(object):
 
-    def __init__(self, name, address):
+    def __init__(self, addr, name=None):
+        self.addr = addr
         self.name = name
-        self.address = address
 
     def to_string(self):
-        return '{0} <{1}>'.format(self.name, self.address)
+        return '{0} <{1}>'.format(self.name, self.addr) if self.name else self.addr
 
 class EnPlain(Enclosure):
 
@@ -124,8 +117,8 @@ if __name__ == '__main__':
     postman.send(
         DefaultEnvelope(
             [
-                StSender(InternetAddress("Kuan-Yu", "kuanyu@yahoo-inc.com")),
-                StRecipient(InternetAddress("Kuan-Yu", "kuanyu@yahoo-inc.com")),
+                StSender(Address("kuanyu@yahoo-inc.com", "Kuan-Yu Chen")),
+                StRecipient(Address("kuanyu@yahoo-inc.com")),
                 StSubject("subject")
             ],
             [
