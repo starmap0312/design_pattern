@@ -95,3 +95,29 @@ print Person(A()).getCode()
 print Person(B()).getCode()
 print Person(AB()).getCode()
 print Person(O()).getCode()
+
+
+# static method vs. classmethod
+class MyClass(object):
+
+    def member_method(self, x):
+        print "executing member_method(%s, %s)" % (self, x)
+        MyClass.class_method(1.1)
+        MyClass.static_method(1.2)
+
+    @classmethod
+    def class_method(cls, x):
+        print "executing class_method(%s, %s)" % (cls, x)
+        MyClass.static_method(2.1)
+
+    @staticmethod
+    def static_method(x):
+        print "executing static_method(%s)" % x    
+
+obj = MyClass()
+obj.member_method(1)
+obj.class_method(2)
+MyClass.class_method(3)
+obj.static_method(4)
+MyClass.static_method(5)
+

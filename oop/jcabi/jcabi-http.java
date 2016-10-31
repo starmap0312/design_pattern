@@ -30,13 +30,14 @@ final class BaseRequest implements Request {
 
     private static final String ENCODING = "UTF-8"; // define a constant string for the class
     private final transient byte[] content;
+    private final transient Wire wire;
 
     // Public ctor.
     // @param uri The resource to work with
     // @param method HTTP method
     // @param cnct Connect timeout for http connection
-    // @param rdd Read timeout for http connection
-    BaseRequest(final String uri, final String method, final byte[] body, final int cnct, final int rdd) {
+    BaseRequest(final Wire wre, final String uri, final String method, final byte[] body, final int cnct) {
+        this.wire = wre;
         URI addr = URI.create(uri);
         if (addr.getPath().isEmpty()) {
             addr = UriBuilder.fromUri(addr).path("/").build();
@@ -45,15 +46,14 @@ final class BaseRequest implements Request {
         this.mtd = method;
         this.content = body.clone();
         this.connect = cnct;
-        this.read = rdd;
     }
 
     public Request method(final String method) { // return New alternated request
-        return new BaseRequest(this.home, method, 0, 0);
+        return new BaseRequest(this.wire, this.home, method, 0);
     }
 
-    public Request timeout(final int cnct, final int rdd) { // return New alternated request
-        return new BaseRequest(this.home, this.mtd, cnct, rdd);
+    public Request timeout(final int cnct) { // return New alternated request
+        return new BaseRequest(this.wire, this.home, this.mtd, cnct);
     }
 
     public Response fetch() throws IOException {
@@ -64,29 +64,68 @@ final class BaseRequest implements Request {
      * Fetch response from server.
      * @param stream The content to send.
      * @return The obtained response
-     * @throws IOException If an IO exception occurs.
      */
     private Response fetchResponse(final InputStream stream) throws IOException {
         final long start = System.currentTimeMillis();
         final Response response = this.wire.send(
             this, this.home, this.mtd,
-            this.hdrs, stream, this.connect,
-            this.read
+            stream, this.connect
         );
         final URI uri = URI.create(this.home);
         return response;
     }
-
-    public Response fetch() throws IOException {
-        return this.fetchResponse(new ByteArrayInputStream(this.content));
-    }
 }
 
+public interface Wire {
 
-class Wire {
+    /*
+     * Send request and return response.
+     * @param req Request
+     * @param home URI to fetch
+     * @param method HTTP method
+     * @param content HTTP body
+     * @param connect The connect timeout
+     * @return Response obtained
+     */
+    Response send(Request req, String home, String method, InputStream content, int connect) throws IOException;
+}
 
-    public Response send(final String home, final String method, final int connect, final int read)
-        throws IOException {
+public class BaseWire implements Wire {
+
+    @Override
+    public Response send(final Request req, final String home, final String method,
+        final InputStream content, final int connect) throws IOException {
+
+        final CloseableHttpResponse response = HttpClients.createSystem().execute(
+            this.httpRequest(home, method, content, connect)
+        );
+
+        try {
+            return new DefaultResponse(
+                req,
+                response.getStatusLine().getStatusCode(),
+                this.consume(response.getEntity())
+            );
+        } finally {
+            response.close();
+        }
+    }
+
+    private byte[] consume(final HttpEntity entity) throws IOException {
+        final byte[] body;
+        if (entity == null) {
+            body = new byte[0];
+        } else {
+            body = EntityUtils.toByteArray(entity);
+        }
+        return body;
+    }
+};
+
+public class BaseWireImpl implements Wire {
+
+    @Override
+    public Response send(final String home, final String method, final int connect) throws IOException {
         final HttpURLConnection conn = HttpURLConnection.class.cast(new URL(home).openConnection());
         try {
             conn.setConnectTimeout(connect);
@@ -95,7 +134,7 @@ class Wire {
             return new DefaultResponse(
                 req,
                 conn.getResponseCode(),
-                conn.getResponseMessage(),
+                conn.getResponseMessage()
             );
         } catch (final IOException exp) {
             throw new IOException(String.format("Failed %s request to %s", method, home), exp);
@@ -131,9 +170,10 @@ public interface Response {
 
 public final class DefaultResponse implements Response {
 
-    public DefaultResponse(final Request request, final int status) {
+    public DefaultResponse(final Request request, final int status, final byte[] body) {
         this.req = request;
         this.code = status;
+        this.content = body.clone();
     }
 
     public Request back() {
@@ -160,7 +200,50 @@ public final class DefaultResponse implements Response {
     }
 }
 
+abstract class AbstractResponse implements Response {
 
+    /*
+     * Encapsulated response.
+     */
+    private final transient Response response;
+
+    /*
+     * Ctor.
+     * @param resp Response
+     */
+    AbstractResponse(final Response resp) {
+        this.response = resp;
+    }
+
+    public final Request back() {
+        return this.response.back();
+    }
+
+    public final int status() {
+        return this.response.status();
+    }
+
+    public final byte[] binary() {
+        return this.response.binary();
+    }
+
+    public final <T extends Response> T as(final Class<T> type) {
+        return this.response.as(type);
+    }
+
+}
+
+/* This response decorator is able to parse HTTP response body as
+ * a JSON document and manipulate with it afterwords
+ *
+ * String name = new JdkRequest("http://my.example.com")
+ *     .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
+ *     .fetch()
+ *     .as(JsonResponse.class)
+ *     .json()
+ *     .readObject()
+ *     .getString("name");
+ */
 public final class JsonResponse extends AbstractResponse {
 
     // Read body as JSON.
@@ -169,19 +252,36 @@ public final class JsonResponse extends AbstractResponse {
         final byte[] body = this.binary();
         final String json;
         try {
-            json = new String(body, "UTF-8");
+            json = new String(body, "UTF-8");  // read the raw content
         } catch (final UnsupportedEncodingException ex) {
             throw new IllegalStateException(ex);
         }
-        return new JsonResponse.VerboseReader(
+        return new JsonResponse.VerboseReader( // wrap the parsed content into an JsonReader
             Json.createReader(
                 new StringReader(
-                    JsonResponse.escape(json)
+                    JsonResponse.escape(json)  // do some parsing on the raw content
                 )
             ),
             json
         );
     }
-
+    /*
+     * Escape control characters in JSON parsing.
+     *
+     * @param input The input JSON string
+     * @return Escaped JSON
+     */
+    private static String escape(final CharSequence input) {
+        final Matcher matcher = JsonResponse.CONTROL.matcher(input);
+        final StringBuffer escaped = new StringBuffer(input.length());
+        while (matcher.find()) {
+            matcher.appendReplacement(
+                escaped,
+                String.format("\\\\u%04X", (int) matcher.group().charAt(0))
+            );
+        }
+        matcher.appendTail(escaped);
+        return escaped.toString();
+    }
 }
 
