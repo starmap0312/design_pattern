@@ -145,7 +145,12 @@ public class BaseWireImpl implements Wire {
 }
 
 
-// interface
+/* You can get this response from one of implementations of Request
+ *
+ * Response response = new JdkRequest("https://www.google.com")
+ *     .header("Accept", "text/html")
+ *     .fetch();
+ */
 public interface Response {
 
     // Get back to the request it's related to.
@@ -155,6 +160,9 @@ public interface Response {
     // Get status of the response as a positive integer number.
     // @return The status code
     int status();
+
+    // Get body as a string, assuming it's UTF-8
+    String binary();
 
     // Raw body as a an array of bytes.
     // @return The body, as a UTF-8 string
@@ -170,6 +178,16 @@ public interface Response {
 
 public final class DefaultResponse implements Response {
 
+    /*
+     * The Charset to use.
+     */
+    private static final Charset CHARSET = Charset.forName("UTF-8");
+
+    /*
+     * Request.
+     */
+    private final transient Request req;
+
     public DefaultResponse(final Request request, final int status, final byte[] body) {
         this.req = request;
         this.code = status;
@@ -184,20 +202,37 @@ public final class DefaultResponse implements Response {
         return this.code;
     }
 
+    public String body() {
+        final String body = new String(this.content, DefaultResponse.CHARSET);
+        return body;
+    }
+
     public byte[] binary() {
         return this.content.clone();
     }
 
     public <T extends Response> T as(final Class<T> type) {
-        try {
-            return type.getDeclaredConstructor(Response.class)
-                .newInstance(this);
-        } catch (final InstantiationException
-            | IllegalAccessException | NoSuchMethodException
-            | InvocationTargetException ex) {
-            throw new IllegalStateException(ex);
-        }
+        return type.getDeclaredConstructor(Response.class).newInstance(this);
     }
+}
+
+/*
+ * Test case for DefaultResponse
+ */
+public final class DefaultResponseTest {
+
+    /*
+     * DefaultResponse can throw when entity is not a Unicode text.
+     */
+    @Test(expected = RuntimeException.class)         // expect a runtime exception
+    public void throwsWhenEntityIsNotAUnicodeString() throws Exception {
+        new DefaultResponse(
+            Mockito.mock(Request.class),             // pass in a mock Request
+            HttpURLConnection.HTTP_OK,
+            new byte[]{(byte) 0xC0, (byte) 0xC0}     // @checkstyle MagicNumber (1 line), not Unicode text
+        ).body();
+    }
+
 }
 
 abstract class AbstractResponse implements Response {
@@ -238,33 +273,30 @@ abstract class AbstractResponse implements Response {
  *
  * String name = new JdkRequest("http://my.example.com")
  *     .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
- *     .fetch()
- *     .as(JsonResponse.class)
- *     .json()
- *     .readObject()
+ *     .fetch()                     // fecth the Response object
+ *     .as(JsonResponse.class)      // adds json() functionality to the Response object
+ *     .json()                      // returns a JsonReader
+ *     .readObject()                // get JsonObject via the reader
  *     .getString("name");
  */
-public final class JsonResponse extends AbstractResponse {
+public final class JsonResponse extends AbstractResponse { // all the original functionalities are inherited
+                                                           // it adds one functionality: json()
+    public JsonResponse(final Response resp) {
+        super(resp);                                       // calls the decoratee's constructor
+    }
 
     // Read body as JSON.
     // @return Json reader
     public JsonReader json() {
-        final byte[] body = this.binary();
-        final String json;
-        try {
-            json = new String(body, "UTF-8");  // read the raw content
-        } catch (final UnsupportedEncodingException ex) {
-            throw new IllegalStateException(ex);
-        }
-        return new JsonResponse.VerboseReader( // wrap the parsed content into an JsonReader
-            Json.createReader(
-                new StringReader(
-                    JsonResponse.escape(json)  // do some parsing on the raw content
-                )
-            ),
-            json
+        final byte[] body = this.binary();              // get the Response object's body
+        final String json = new String(body, "UTF-8");  // read the raw content
+        return Json.createReader(
+            new StringReader(
+                JsonResponse.escape(json)           // do some parsing on the raw content
+            )
         );
     }
+
     /*
      * Escape control characters in JSON parsing.
      *

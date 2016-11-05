@@ -33,3 +33,4 @@ class Concrete(Abstract):
 obj = Concrete()
 obj.read()
 obj.write("message")
+
