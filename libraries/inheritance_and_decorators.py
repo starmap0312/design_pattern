@@ -11,7 +11,6 @@
 
 from abc import ABCMeta, abstractmethod
 
-# how to define multiple decorators, each of which add one more additional functionality 
 class Interface(object):
     __metaclass__ = ABCMeta
 
@@ -19,14 +18,34 @@ class Interface(object):
     def basic_func(self):
         pass
 
-class ConcreteObject(Interface):
+class SimpleImpl(Interface):
 
     def basic_func(self):
         return 'this is a basic functionality of the concrete object'
 
+# a good practice is to write the SimpleImpl inside the Interface class: name it Simple/Base/Default
+# use Interface.Simple / Interface.Base / Interface.Default when needed
+# this reduces the number of class files and helps the code readability
+
+class Interface(object):
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
+    def basic_func(self):
+        pass
+
+    class Simple(object):
+
+        def basic_func(self):
+            return 'this is a basic functionality of the concrete object'
+
+obj = Interface.Simple()
+print obj.basic_func()
+
+
 # example 1: (Type 1) simple decorator, decorating the object's basic funcationality
 
-class SimpleDecorator(Interface):
+class Decorator(Interface):
 
     def __init__(self, interface):
         self.interface = interface
@@ -34,19 +53,19 @@ class SimpleDecorator(Interface):
     def basic_func(self):
         return self.interface.basic_func() + ', added something new to the basic functionality'
 
-obj = SimpleDecorator(ConcreteObject())
+obj = Decorator(SimpleImpl())
 print obj.basic_func()
 
 
 # example 2: (bad design) inheritance that adds one additional funcationality to an object
 
-class SubclassObject(ConcreteObject):
+class SubclassObject(SimpleImpl):
 
     def more_func(self):
         return 'this is a new functionality'
 
 # this is a bad design, as it inherits (may override) an concrete class
-# it creates tight coupling between SubclassObject (derived class) and ConcreteObject (base class)
+# it creates tight coupling between SubclassObject (derived class) and SimpleImpl (base class)
 # implementation inheritance is bad:
 #   a procedural technique for code reuse and turns objects into containers with data and procedures
 obj = SubclassObject()
@@ -68,8 +87,33 @@ class MoreFuncDecorator(Interface):
         return 'this is a new functionality'
 
 # we program to interface instead, not to implementation
-# it creates loose coupling between MoreFuncDecorator (decorator class) and ConcreteObject (base class)
-obj = MoreFuncDecorator(ConcreteObject())
+# it creates loose coupling between MoreFuncDecorator (decorator class) and SimpleImpl (base class)
+obj = MoreFuncDecorator(SimpleImpl())
+print obj.basic_func()
+print obj.more_func()
+
+# as we program to interface, a good practice is to write the MoreFuncDecorator inside the Inferface class
+#   because they are closely related/coupled and it also helps code readability
+#   then use Interface.MoreFuncDecorator when needed 
+class Interface(object):
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
+    def basic_func(self):
+        pass
+
+    class MoreFuncDecorator(object):
+
+        def __init__(self, interface):
+            self.interface = interface
+
+        def basic_func(self):
+            return self.interface.basic_func()   # preserves the object's basic functionality
+
+        def more_func(self):
+            return 'this is a new functionality'
+
+obj = Interface.MoreFuncDecorator(SimpleImpl())
 print obj.basic_func()
 print obj.more_func()
 
@@ -101,10 +145,10 @@ class ConcreteDecorator2(AbstractDecorator): # inherit the basic func() from the
     def more_func_2(self):                                  # implement an additional functionality
         return 'this is another new functionality'
 
-obj = ConcreteDecorator1(ConcreteObject())
+obj = ConcreteDecorator1(SimpleImpl())
 print obj.basic_func()
 print obj.more_func_1()
 
-obj = ConcreteDecorator2(ConcreteObject())
+obj = ConcreteDecorator2(SimpleImpl())
 print obj.basic_func()
 print obj.more_func_2()
