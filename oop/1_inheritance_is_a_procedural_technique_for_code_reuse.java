@@ -1,12 +1,13 @@
-// inherience/extends is evil 
+// implementation inherience is evil 
 // 1) no concrete base classes, use interfaces instead, then programming to interfaces, not implementations
 //    i.e. most of the code should be written entirely in terms of interfaces, ex. not HashMap but Map interface
 // 2) it creates tight coupling between derived classes and base class 
 //    (modifying base class may affect derived classes)
 // 3) abstraction inherience is OK, whereas implementation inherience is EVIL
 //
-// inheritence/subtyping itself is not evil, it enables polymorphism
+// inheritence/subtyping/subclassing itself is not evil, it enables polymorphism
 //   it derives a characteristic from a base object
+//   ex. MallardDuck (subclass) is a type of Duck (superclass): Duck should be able to quack() and fly()
 //
 // example
 //

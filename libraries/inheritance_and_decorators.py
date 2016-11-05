@@ -1,6 +1,6 @@
 # two types of decorations:
 #   Type 1) decorating an exsiting functionality of an object
-#   Type 2) adding one additional functionality to an object
+#   Type 2) adding one additional functionality to an object (works as inheritance)
 #
 # how to define a family of decorators, each of which add one additional functionality to the object 
 #   define an abstract decorator, which is inherited by a set of decorator subclasses
@@ -38,7 +38,23 @@ obj = SimpleDecorator(ConcreteObject())
 print obj.basic_func()
 
 
-# example 2: (Type 2) decorator that adds one additional funcationality to an object
+# example 2: (bad design) inheritance that adds one additional funcationality to an object
+
+class SubclassObject(ConcreteObject):
+
+    def more_func(self):
+        return 'this is a new functionality'
+
+# this is a bad design, as it inherits (may override) an concrete class
+# it creates tight coupling between SubclassObject (derived class) and ConcreteObject (base class)
+# implementation inheritance is bad:
+#   a procedural technique for code reuse and turns objects into containers with data and procedures
+obj = SubclassObject()
+print obj.basic_func()
+print obj.more_func()
+
+
+# example 2: (good design) decorator that adds one additional funcationality to an object
 
 class MoreFuncDecorator(Interface):
 
@@ -49,13 +65,16 @@ class MoreFuncDecorator(Interface):
         return self.interface.basic_func()   # preserves the object's basic functionality
 
     def more_func(self):
-        return 'this is a new functionality' 
+        return 'this is a new functionality'
 
+# we program to interface instead, not to implementation
+# it creates loose coupling between MoreFuncDecorator (decorator class) and ConcreteObject (base class)
 obj = MoreFuncDecorator(ConcreteObject())
 print obj.basic_func()
 print obj.more_func()
 
-# example 3: (Type 2) a famility of decorators, each of which adds one additional functionality to the object
+
+# example 4: (Type 2) a famility of decorators, each of which adds one additional functionality to the object
 
 class AbstractDecorator(Interface):          # should not be instantiated (declare as abstract class in Java)
                                              # it's for code reusibility
