@@ -28,14 +28,17 @@
 # test double
   objects or procedures that look and behave like their release / production counterparts
   types of test double
-  1) test stub: providing the tested code with "indirect input"
-  2) mock object: for verifying "indirect output" of the tested code
-                  by first defining the expectations before the tested code is executed
-  3) test spy: for verifying "indirect output" of the tested code
-               by asserting the expectations afterwards, instead of defining the expectations
-  4) fake object: used as a simpler implementation
-                  ex. using an in-memory database instead of doing a real database access
-  5) dummy object: when a parameter is needed but not used by the tested method
+  0) dummy object: a parameter needed but not used by the tested method
+     i.e. they are just used to fill parameter lists
+  1) test stub: providing the tested code with "predefined input"
+     provide answers to calls made on them during the test (not responding to anything outside)
+     i.e. they are used so that the method you're testing gets the data it needs
+  2) mock object: for verifying the objects you're testing get the calls they are expected to receive
+     objects pre-programmed with expectations of the calls they are expected to receive
+     i.e. mock objects expect certain methods to be called on them (test fails if their expectations aren't met)
+  4) fake object: a simpler, lightweight implementation used for testing and not suitable for production
+                  ex. an in-memory database instead of a real database access
+                      a fake web service at localhost instead of a remote, real service
  
 # structure of project directory
   PROJECT_DIR

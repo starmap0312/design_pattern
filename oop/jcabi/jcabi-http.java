@@ -1,3 +1,4 @@
+// a Request object should provide fetch() functionality that returns a Response object
 public interface Request {
 
     String GET = "GET";
@@ -22,10 +23,10 @@ public interface Request {
 
     // Execute it with a specified HTTP method.
     // @return Response
-    // @throws IOException If fails to fetch HTTP request
     Response fetch() throws IOException;
 }
 
+// a BaseRequest object uses the passed-in Wire object to send request and fetch() response
 final class BaseRequest implements Request {
 
     private static final String ENCODING = "UTF-8"; // define a constant string for the class
@@ -56,7 +57,7 @@ final class BaseRequest implements Request {
         return new BaseRequest(this.wire, this.home, this.mtd, cnct);
     }
 
-    public Response fetch() throws IOException {
+    public Response fetch() throws IOException { // major functionality: send request with content via a wire
         return this.fetchResponse(new ByteArrayInputStream(this.content));
     }
 
@@ -66,12 +67,7 @@ final class BaseRequest implements Request {
      * @return The obtained response
      */
     private Response fetchResponse(final InputStream stream) throws IOException {
-        final long start = System.currentTimeMillis();
-        final Response response = this.wire.send(
-            this, this.home, this.mtd,
-            stream, this.connect
-        );
-        final URI uri = URI.create(this.home);
+        final Response response = this.wire.send(this, this.home, this.mtd, stream, this.connect);
         return response;
     }
 }
@@ -100,15 +96,11 @@ public class BaseWire implements Wire {
             this.httpRequest(home, method, content, connect)
         );
 
-        try {
-            return new DefaultResponse(
-                req,
-                response.getStatusLine().getStatusCode(),
-                this.consume(response.getEntity())
-            );
-        } finally {
-            response.close();
-        }
+        return new DefaultResponse(
+            req,
+            response.getStatusLine().getStatusCode(),
+            this.consume(response.getEntity())
+        );
     }
 
     private byte[] consume(final HttpEntity entity) throws IOException {
@@ -317,3 +309,76 @@ public final class JsonResponse extends AbstractResponse { // all the original f
     }
 }
 
+/*
+ * Implementation of Request that always returns the same response, specified in the constructor.
+ * final Response resp = new FakeRequest()
+ *     .withBody("{\n\t\r\"foo-foo\":2,\n\"bar\":\"\u20ac\"}")
+ *     .fetch();
+ */
+public final class FakeRequest implements Request {
+
+    private final transient Request base;
+    private final transient int code;
+    private final transient byte[] content;
+
+    /*
+     * Public ctor.
+     * @param status HTTP status code to return
+     * @param body HTTP body
+     */
+    public FakeRequest(final int status, final byte[] body) {
+        this.code = status;
+        this.content = body.clone();
+        this.base = new BaseRequest(
+            new Wire() {              // a dummy Wire that returns a DefaultResponse with passed-in content
+                public Response send(final Request req) {
+                    return new DefaultResponse(req, FakeRequest.this.code, FakeRequest.this.content);
+                }
+            },
+            "http://localhost:12345/see-FakeRequest-class"
+        );
+    }
+
+    public RequestBody body() {
+        return this.base.body();
+    }
+
+    public Response fetch() throws IOException {
+        return this.base.fetch();
+    }
+
+    /*
+     * Make a similar request, with the provided body.
+     * @param body Body
+     * @return New request
+     */
+    public FakeRequest withBody(final byte[] body) {
+        return new FakeRequest(this.code, body);
+    }
+}
+
+/*
+ * Test case for JsonResponse
+ */
+public final class JsonResponseTest {
+
+    /*
+     * JsonResponse can read and return a JSON document.
+     */
+    @Test
+    public void readsJsonDocument() throws Exception {
+        final Response resp = new FakeRequest()
+            .withBody("{\n\t\r\"foo-foo\":2,\n\"bar\":\"\u20ac\"}")
+            .fetch();
+        final JsonResponse response = new JsonResponse(resp);
+        MatcherAssert.assertThat(
+            response.json().readObject().getInt("foo-foo"),
+            Matchers.equalTo(2)
+        );
+        MatcherAssert.assertThat(
+            response.json().readObject().getString("bar"),
+            Matchers.equalTo("\u20ac")
+        );
+    }
+}
+// use FakeRequest which always returns the same response specified in the constructor to test the json() method

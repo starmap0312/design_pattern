@@ -1,25 +1,27 @@
 // mocking is evil
-//   if the class is too complex, mocking is difficult and a waste
-//     ex. methods return other objects, which also have methods
-//         when we use a mock for the object, we need all of its methods return valid objects 
+// if the class is too complex, mocking is difficult and a waste
+//   ex. methods return other objects, which also have methods
+//       when we use a mock for the object, we need all of its methods return valid objects 
 //
 // example: mocking a complex object
 //
 // (bad design: use mock)
 //
 // interface of a complex object: it's table() method returns another object
+
 public interface Region {
     Table table(String name);
 }
 
 // that object's frame(), put() and region() methods also return other objects
+
 public interface Table {
     Frame frame();
     Item put(Attributes attrs);
     Region region();
 }
 
-// it is difficult to mock such a complex object
+// it is difficult to mock such a complex object and usually a waste of time
 public void testMe() {
     // many more lines here...
     Frame frame = Mockito.mock(Frame.class);      // need to mock Frame object
@@ -31,7 +33,7 @@ public void testMe() {
                                                   // Region's table() method needs to return Table object
 }
 
-// the client code which uses a Region object
+// the client code of Region object
 public class Employee {
 
     private final String name;
@@ -56,15 +58,13 @@ public class Employee {
     }
 }
 
-// the preparation step for mocking a complex object is difficult
-// the unit test code will be much longer than the client class itself
-//
+// mocking a complex object is difficult: the unit test code may be longer than the client class itself
 // the solution:
 //   create fake classes, ex. MkRegion, and ship them together with real classes
 //
 // (good design: use fake objects instead and ship them together with client classes)
 //
-// the test class utilizes the fake object
+// the testing code with a fake object
 public class EmployeeTest {
 
     public void canFetchSalaryFromDynamoDb() {
