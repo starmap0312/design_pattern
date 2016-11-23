@@ -5,18 +5,35 @@ import numpy as np
 # 1) Series: one-dimensional ndarray with axis labels (including time series)
 
 print "1) creating a Series by passing a list of values, letting pandas create a default integer index"
-series = pd.Series([1,3,5,np.nan,6,8])
+series = pd.Series([1, 3, 5, np.nan, 6, 8])
 print series
 
-# 2) DataFrame: two-dimensional size-mutable, potentially heterogeneous tabular data structure with labeled axes
+# 2.1) DataFrame: two-dimensional size-mutable, potentially heterogeneous tabular data structure with labeled axes
 #               (rows and columns)
 
 print "2.1) creating a DataFrame by passing a numpy array, with a datetime index and labeled columns"
-dates = pd.date_range('20160701', periods=6)
-print dates
+rng = pd.date_range('20160701', periods=6)
+print rng
 
-df = pd.DataFrame(np.random.randn(6,4), index=dates, columns=list('ABCD'))
+df = pd.DataFrame(np.random.randn(len(rng), len(list('ABCD'))), index=rng, columns=list('ABCD'))
 print df
+
+# append a row to the data frame
+print 'append a row to data frame'
+row = pd.Series(['X', 'X', 'X', 'X'], index=['A', 'B', 'C', 'D'], name=pd.to_datetime('20160707'))
+print df.append(row)
+
+# remove a row from the data frame
+print 'remove a row to data frame'
+df.drop(df.index[[5]])
+print df
+
+# 2.2) Time Series
+print "2.2) simple, powerful, efficient functionality for performing resampling operations during frequency conversion"
+rng = pd.date_range('11/1/2016', periods=4, freq='H')
+print rng
+ts = pd.Series(np.random.randint(0, 500, len(rng)), index=rng)
+print ts
 
 print "2.2) creating a DataFrame by passing a dict of objects that can be converted to series-like"
 
@@ -81,13 +98,6 @@ print left
 print right
 print pd.merge(left, right, on="key")
 
-# 8) Time Series
-print "simple, powerful, efficient functionality for performing resampling operations during frequency conversion"
-rng = pd.date_range('6/1/2016', periods=5, freq='S')
-print rng
-ts = pd.Series(np.random.randint(0, 500, len(rng)), index=rng)
-print ts
-
-# 9) Getting Data In/Out
+# 8) Getting Data In/Out
 df.to_csv("foo.csv")
 df.to_excel("foo.xlsx", sheet_name="MySheet")

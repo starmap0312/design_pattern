@@ -18,6 +18,7 @@
 #          ^                                             ^
 #          | (IS_A)  constructs via factory method       | (IS_A)
 #    ClientExample .................................> ServiceExample
+#    (different ClientExample has different factory method, which creates different ServiceExample)
 #
 # - factory method is similar to abstract factory without emphasis on families
 # - often, design starts out using factory method, and evolve toward abstract factory,
