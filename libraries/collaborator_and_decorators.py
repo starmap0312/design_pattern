@@ -10,10 +10,10 @@ class A(object):
 # Scenario 1: class C has one collaborator as its characteristics to complete a task()
 class C(object):
 
-    def __init__(self, a):
+    def __init__(self, a):  # the collaborator object can be substituted
         self.a = a
 
-    def task(self):
+    def task(self):         # works like a decorator if class C also implements interface class A
         return "C's func: use {0} to complete a task".format(self.a.func_a())
 
 # client code: to test task(), we can substitute class A with a fake class when constructing class C
@@ -99,8 +99,8 @@ class C(object):
 # client code: to test task(), we can substitute classes A with a fake class
 print C(A()).task()
 # real-world example:
-#   postman = Postman(SMTP('example.relay.com'))
-#   postman.send(DefaultEnvelope(EnHTML("<html><p>text</p></html>"))
+#   session = Session('example.db.com')
+#   session.query('SELECT * FROM posts')
 
 # Scenario 3: class C preserves class A's functionality and adds an additional functionality task()
 class C(object):
@@ -108,7 +108,7 @@ class C(object):
     def __init__(self, a):
         self.a = a
 
-    def func_a(self):           # class C works as an extention of class A
+    def func_a(self):           # works like decorator: class C works as an extention of class A
         return self.a.func_a()
 
     def task(self, b):
@@ -117,6 +117,9 @@ class C(object):
 c = C(A())
 print c.func_a()
 print c.task(B())
+# real-world example:
+#   postman = Postman(SMTP('example.relay.com'))
+#   postman.send(DefaultEnvelope(EnHTML("<html><p>text</p></html>"))
 
 # Scenario 4: class C preserves class A's functionality and adds an additional functionality task()
 class C(object):
@@ -125,7 +128,7 @@ class C(object):
         self.a = a
         self.b = b
 
-    def func_a(self):
+    def func_a(self):              # works like decorator
         return self.a.func_a()
 
     def task(self):
