@@ -7,8 +7,10 @@
 #   b) with the hollywood principle:
 #      the binding between the client and the service object is established at run-time
 # - two classical examples:
-#   a) dependency injection pattern: the dependences/callbacks can be injected to the client
-#   b) service locator pattern: there exists a central registry class where the services
+#   a) dependency injection pattern
+#      the dependences or callbacks can be injected to the client
+#   b) service locator pattern
+#      there exists a central registry class where the services
 #      objects are registered at run-time (service look-up when needed)
 # - relies on delegation:
 #     an object delegates its stated task to an associated helper object

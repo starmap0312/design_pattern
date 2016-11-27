@@ -80,9 +80,9 @@ client = ConventionalClient()
 print client.greet()
 
 #   2) adapter pattern:
-#   - allows the interface of an existing class to be used from another interface, making
-#     existing classes work together without modifying their source code
-#   - the adapter bridges between the existing adaptee interface and the target interface
+#    - allows the interface of an existing class to be used from another interface, making
+#      existing classes work together without modifying their source code
+#    - the adapter bridges between the existing adaptee interface and the target interface
 #
 #            Target Interface
 #                   ^

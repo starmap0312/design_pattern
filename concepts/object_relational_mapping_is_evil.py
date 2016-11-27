@@ -11,7 +11,7 @@
 #     use Data Access Object (DAO) design pattern to abstract these statements and offer a lightweight
 #       object-oriented interface to the application 
 #
-#  an example:
+#  example:
 #
 #  (without ORM)
 class DBCommand(object):

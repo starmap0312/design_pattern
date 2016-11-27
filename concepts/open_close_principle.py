@@ -8,7 +8,9 @@
 #   b) inversion of control (dependency injection or service look-up)
 #   c) used in decorator pattern, factory method, and observer pattern, etc.
 #
-# - bad design: without open/close principle
+# example
+#
+# (bad design: without open/close principle)
 
 class Shape(object):
     ''' base class '''
@@ -49,7 +51,7 @@ editor = GraphicEditor()
 editor.drawShape(Rectangle())
 editor.drawShape(Circle())
 
-# better design: with open/close principle
+# (good design: with open/close principle)
 
 class Shape(object):
     ''' an interface '''

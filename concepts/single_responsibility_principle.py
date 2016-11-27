@@ -4,7 +4,7 @@
 #   to separate them in different classes; otherwise, if they are coupled in one class, then 
 #   changing one may require to change the other accordingly
 # - how to avoid over design (when not to separate)?
-#   if two responsibilites always change at the time, there is no need to separate them
+#   if two responsibilites always change at the same time, there is no need to separate them
 #   a good separation can be done only when the full picture of how the application should 
 #   work is well understood
 # - example:
