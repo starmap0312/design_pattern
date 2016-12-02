@@ -192,3 +192,92 @@ final class PgPost implements Post {
             .select(new SingleOutcome<String>(String.class));
     }
 }
+
+// performance problem
+// 1) accessing each PgPost's attribute requires a separate DB session
+// 2) to improve the performance, we can define a cache decorator class
+
+final class ConstPost implements Post {
+
+    private final Post origin;
+    private final Date dte;
+    private final String ttl;
+
+    public ConstPost(Post post, Date date, String title) { // pass in the data & title cached data
+        this.origin = post;
+        this.dte = date;
+        this.ttl = title;
+    }
+
+    public int id() {                                      // use the origin Post to get the id
+        return this.origin.id();
+    }
+
+    public Date date() {                                   // return the cached date
+        return this.dte;
+    }
+
+    public String title() {                                // return the cached title
+        return this.ttl;
+    }
+}
+
+final class ConstPgPosts implements Posts {
+    // ...
+
+    public Iterable<Post> iterate() {
+        return new JdbcSession(this.dbase)
+            .sql("SELECT * FROM post")
+            .select(
+                new ListOutcome<Post>(
+                    new ListOutcome.Mapping<Post>() {
+                        @Override
+                        public Post map(final ResultSet rset) {
+                            return new ConstPost(
+                                new PgPost(
+                                    ConstPgPosts.this.dbase,
+                                    rset.getInteger(1)
+                                ),
+                                Utc.getTimestamp(rset, 2),
+                                rset.getString(3)
+                            );
+                        }
+                    }
+                )
+            );
+    }
+}
+
+// transaction problem
+// 1) either every object deals with its own transaction and encaplsulate them (nested transaction problem)
+// 2) or create a session-wide transaction object that accepts a ad-hoc & annonymous "callable" class
+
+final class Txn {
+
+    private final DataSource dbase;
+
+    public <T> T call(Callable<T> callable) { // the transaction object accepts a callable object in its call() method
+        JdbcSession session = new JdbcSession(this.dbase);
+        try {
+            session.sql("START TRANSACTION").exec();
+            T result = callable.call();       // the transaction object wraps the callable object's call() in a transaction block
+            session.sql("COMMIT").exec();
+            return result;
+        } catch (Exception ex) {
+            session.sql("ROLLBACK").exec();
+            throw ex;
+        }
+    }
+}
+
+new Txn(dbase).call(
+    new Callable<Integer>() {                 // create an annonymous callable object for each transaction operations
+        @Override
+        public Integer call() {
+            Posts posts = new PgPosts(dbase);
+            Post post = posts.add(new Date(), "How to cook an omelette");
+            posts.comments().post("This is my first comment!");
+            return post.id();
+        }
+    }
+);

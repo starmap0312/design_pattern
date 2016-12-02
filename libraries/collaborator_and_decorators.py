@@ -108,9 +108,6 @@ class C(object):
     def __init__(self, a):
         self.a = a
 
-    def func_a(self):           # works like decorator: class C works as an extention of class A
-        return self.a.func_a()
-
     def task(self, b):
         return "C's func: use {0} and {1} to complete a task".format(self.a.func_a(), b.func_b())
 
@@ -128,7 +125,7 @@ class C(object):
         self.a = a
         self.b = b
 
-    def func_a(self):              # works like decorator
+    def func_a(self):              # works like decorator: class C works as an extention of class A
         return self.a.func_a()
 
     def task(self):
