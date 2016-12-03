@@ -1,26 +1,27 @@
 # Bridge Pattern (a GOOD design pattern)
 # - provides a way to decouple abstraction (interface) from implementation
-# - bridge pattern is designed up-front to let the abstraction and implementation
-#   so that they can vary independently, whereas adapter makes things work after they're designed
+#   builds an interface and an implementation in such a way that either can vary independently 
+# - bridge pattern is designed up-front to let the abstraction and implementation vary independently
+#   whereas adapter makes things work after they're designed
 #
 # (conventional)
-#                     Shape             ...... (interface: by which the client knows how to use the implementation)
+#                     Shape                                   .. (interface: by which client knows how to use implementation)
 #                      | |
 #                  ----   ---- (IS_A)
-#                  |         |
-#            DrawingAPI1  DrawingAPI2   ...... (implementation)
+#                  |         |         (HAS_A)
+#               Circle     Rectangle -----------> DrawingImpl .. (actual implementation)
 #
 # (bridge pattern)
 #
 #                         (HAS_A)
-#           Shape ------------------------> DrawingAPI
-#            | |                              |    | 
+#           Shape ------------------------> DrawingAPI        .. (actual implementation has their own interface)
+#            | |                              |    |             (decouple interface-implementation from actual implementation)
 #       -----  --------(IS_A)            -----    ----- (IS_A)
 #       |             |                  |            |
-#   CircleShape RectangleShape      DrawingAPI1  DrawingAPI2 .......... (the actual implementation has their own interface)
-#       .             .                                                 (thus decoupled from actual interface implementation)
-#       .             .
-#   (the actual interface implementation: by which the client  knows how to use the implementation)
+#   Circle         Rectangle      DrawingImpl1  DrawingImpl2
+#       .             .                 .             .                 
+#       .             .                 .             .
+#   (interface-implementation)       (actual implementation)
 #
 
 class Shape(object):
@@ -33,12 +34,12 @@ class Shape(object):
     def draw(self):
         raise NotImplementedError
 
-class CircleShape(Shape):
+class Circle(Shape):
     # an implementation of the abstraction interface
     # so that the abstraction can have many implementations and new abstractions can be added easily
 
     def __init__(self, x, y, radius, drawingAPI):
-        super(CircleShape, self).__init__(drawingAPI)
+        super(Circle, self).__init__(drawingAPI)
         self.x = x
         self.y = y
         self.radius = radius
@@ -52,20 +53,20 @@ class DrawingAPI(object):
     def drawCircle(self, x, y, radius):
         raise NotImplementedError
 
-class DrawingAPI1(DrawingAPI):
+class DrawingImpl1(DrawingAPI):
     # an instance of the implementation interface
 
     def drawCircle(self, x, y, radius):
         print 'API1 draws a circle at (%.2f, %.2f) with radius %.2f' % (x, y, radius)
 
-class DrawingAPI2(DrawingAPI):
+class DrawingImpl2(DrawingAPI):
     # an instance of the implementation interface
 
     def drawCircle(self, x, y, radius):
         print 'API2 draws a circle at (%.2f, %.2f) with radius %.2f' % (x, y, radius)
 
 # the abstraction instance takes the implementation instance as a parameter of its constructor
-shape = CircleShape(1, 2, 3, DrawingAPI1())
+shape = Circle(1, 2, 3, DrawingImpl1())
 shape.draw()
-shape2 = CircleShape(2, 3, 4, DrawingAPI2())
+shape2 = Circle(2, 3, 4, DrawingImpl2())
 shape2.draw()

@@ -21,14 +21,16 @@
 #   to create the implementation objects
 
 class Stack(object):
-    # create an interface/wrapper class that HAS_A implementation object and delegates all requests to it
+    # interface that HAS_A an actual stack implementation object and delegates all requests to it (a wrapper class)
 
-    def __init__(self, a_type=None):
+    def __init__(self, a_type):
         # creation of implementation classes through parameter, direct coupling
         # here we can also change the design to pass in an abstract factory for creation,
         # decoupling abstraction and implementation 
-        if a_type is None or a_type == 'mine':
+        if a_type == 'mine':
             self.imp = StackMine()
+        else:
+            StackNull() # other actual implementation 
 
     def push(self, num):
         self.imp.push(int(num))
@@ -40,8 +42,7 @@ class Stack(object):
         return self.imp.empty()
 
 class StackHanoi(Stack):
-    # embellish interface class with derived classes if desired
-    # specify the handle (the way to access the body)
+    # specific interface implemenation: specify the handle (the way to access the body)
 
     def __init__(self, a_type=None):
         super(StackHanoi, self).__init__(a_type if a_type else 'mine')
@@ -58,7 +59,7 @@ class StackHanoi(Stack):
             self.imp.push(num)
 
 class StackImp(object):
-    # create an implementation/body base class
+    # create an abstraction for implementation, i.e. implementation interface (i.e. body base class)
 
     def push(self, obj):
         raise NotImplementedError
@@ -73,7 +74,7 @@ class StackImp(object):
         raise NotImplementedError
 
 class StackMine(StackImp):
-    # derive the separate implementations from the common abstraction
+    # actual implementation of the Stack 
 
     def __init__(self):
         self.items = []
