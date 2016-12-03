@@ -48,19 +48,18 @@
 //      because it requires Object1 to know about Object3 (Object1 is coupled to Object3 as well)
 // 3) simple-object coupling (normal and acceptable)
 //    Object1 is coupled to Object2 if Object1 instantiates Object2
-// 4) semantic coupling (bad)
-//    one object makes use not of some syntactic element of another object but of some semantic
-//      knowledge of another object's inner workings
+// 4) semantic coupling (bad: tightly coupled to an object's implementation details)
+//    Object1 makes use not of some syntactic element of Object2 but of some semantic knowledge of Object2's
+//      inner workings
 //   ex.
-//   a) Module1 passes a control flag to Module2 that tells Module2 what to do
-//      this requires Module1 to make assumptions about the internal workings of Module2
-//      i.e. Module2 needs to know what to do with the control flag
-//   b) Module2 uses global data after the global data has been modified by Module1
-//      this requires Module2 to assume that Module1 has modified the data Module2 needs
-//   c) Module1 passes Object to Module2, and Module1 needs to know Module2 uses only 3 of Object's 7 methods
-//      it initializes Object only partially with the specific data those three methods need
-//   d) Module1 passes BaseObject to Module2 and Module2 needs to know Module1 is really passing it DerivedObject
-//      it casts BaseObject to DerivedObject and calls methods that are specific to DerivedObject
+//   a) Object1 passes a control flag to Object2 that tells Object2 what to do
+//      this requires Object1 to make assumptions about the internal workings of Object2
+//   b) Object1 uses global data after the global data has been modified by Object2
+//      this requires Object1 to assume that Object2 has modified the data Object1 needs
+//   c) Object1 passes Object3 to Object2, and Object1 knows that Object2 uses only 3 out of Object3's 7 methods
+//      it initializes Object3 only partially with the specific data those 3 methods need
+//   d) Object1 accepts a BaseObject as parameter but Object2 is really passing it DerivedObject
+//      Object1 knows about it, casting the BaseObject to DerivedObject and calling methods that are specific to DerivedObject
 //
 // - Build Hierarchies
 // a tiered information structure: most general/abstract representation is at the top
