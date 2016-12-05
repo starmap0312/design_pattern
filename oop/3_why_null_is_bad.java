@@ -65,8 +65,8 @@ public Employee getByName(String name) {
 }
 
 // 2) in OOP, there are two alternatives to NULL references:
-//    a) use NULL object
-//    b) throw Exceptions
+//    a) use NULL object with common behaviors or throw exceptions
+//    b) throw Exceptions directly: fail fast
 //
 // a) implementation of NULL objects
 
@@ -95,12 +95,12 @@ dept.getByName("Jeffrey").transferTo(dept2);
 
 // 3) the performance issues: NULL reference has performance advantanges? No.
 //
-//   a) NULL reference
+// a) NULL reference
 //
 // ex. a real example of using Map in Java: only one search in Map is required
 // the client code in procedural programming
 Employee employee = employees.get("Jeffrey"); // use of get() method of Map interface in Java
-if (employee == NULL) { // fail slowly
+if (employee == NULL) {                       // fail slowly
     throw new EmployeeNotFoundException();
 }
 return employee;
@@ -132,10 +132,6 @@ public Employee get(String name) {
 //      complain by throwing exceptions, if the provided data is not sufficient or wrong
 //      you can also use a NULL object instead
 //   
-// ex. a Null Object exposes some common behavior and throws exceptions on all other method calls
-// the client code in OOP
-dept.getByName("Jeffrey").transferTo(dept2);
-
 // implementation of NULL object in getByName()
 public Employee getByName(String name) {
     int id = database.find(name);
@@ -155,3 +151,10 @@ public Employee getByName(String name) {
     }
     return employee;
 }
+
+// ex. Null Object exposes common behavior and throws exceptions on all other method calls
+// the client code in OOP
+employee = dept.getByName("Unknown")
+System.out.println(employee.name()); // common behavior
+employee.transferTo(dept2);          // throw an exception
+
