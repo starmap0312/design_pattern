@@ -49,3 +49,11 @@ interface InputStream {
 final InputStream input = new FileInputStream("/tmp/a.txt");
 final byte b = new InputStream.SingleByte(input).read();     // read a single byte from the file input stream
 
+// why is it good?
+//   the functionality of reading a single byte is outside of InputStream (it's not its business)
+//   i.e. the InputStream doesn't need to know how to manage the data after it is read
+//        it is responsible only for its reading, not parsing or manipulating afterwards (more cohesive)
+// 
+// rule of thumbs:
+// 1) interfaces must be small: method overloading in interfaces is a code smell
+// 2) an interface with more than three methods is a good candidate for refactoring
