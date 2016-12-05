@@ -1,6 +1,6 @@
 # Abstract Factory Pattern (an OK design pattern)
 #
-#             AbstractFactory
+#             AbstractFactory      .... (sometimes serves as a simple factory for FactoryExamples)
 #              ^          ^
 #       (IS_A) |          | (IS_A)                (HAS_A)                        (IS_A)
 #  FactoryExample1 ...  FactoryExample2 .......................> Service1Example ------> Service1

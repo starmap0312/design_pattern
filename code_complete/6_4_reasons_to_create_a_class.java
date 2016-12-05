@@ -1,7 +1,7 @@
 // - Reasons to create a class
 //   1) model real-world objects
 //   2) model abstract objects
-//   3) reduce complexity
+//   3) reduce complexity: classes are primary tool for managing complexity
 //   4) isolate complexity
 //   5) hide implementation details
 //   6) limit effects of changes

@@ -37,27 +37,37 @@ class Foo {
 // what is the problem?
 //
 // ex. 10 months later, we may put more code around them
-//
-List<String> list = new LinkedList();
-// 10 more lines here
-Foo.append(list, "Jeff");   // not certain if the line can be removed, as the lines are coupled together
-Foo.append(list, "Walter"); // the knowledge about the order are hidden inside the body of append method
-// 10 more lines here
-return list;
+
+class Foo {
+
+    public List<String> names() {
+        List<String> list = new LinkedList();
+        // 10 more lines here
+        Foo.append(list, "Jeff");   // not certain if the line can be removed, as the lines are coupled together
+        Foo.append(list, "Walter"); // the knowledge about the order are hidden inside the body of append method
+        // 10 more lines here
+        return list;
+    }
+}
 // if we want to remove the line Foo.append(list, "Jeff"), we need to check the body of append() method
 // see if it will affect the result returned in the last line
 
-// the code may be refactored by others as follows
-//
-List<String> list = new LinkedList();
-if (/* something */) { // not sure if the list can be returned before the two append method calls
-    return list;
+// the code may be further refactored by others as follows
+
+class Foo {
+
+    public List<String> names() {
+        List<String> list = new LinkedList();
+        if (/* something */) { // not sure if the list can be returned before the two append method calls
+            return list;
+        }
+        // 10 more lines here
+        Foo.append(list, "Walter"); // not certain if the order of appending the two words can be changed 
+        Foo.append(list, "Jeff");
+        // 10 more lines here
+        return list;
+    }
 }
-// 10 more lines here
-Foo.append(list, "Walter"); // not certain if the order of appending the two words can be changed 
-Foo.append(list, "Jeff");
-// 10 more lines here
-return list;
 
 // if we want to return list before the two append() calls, we need to check the body of append() methods
 //
@@ -102,27 +112,36 @@ class MyAddition(ListInterface) {
 // the client code has only one line
 MyAddition(MyAddition(new LinkedList()).add("Jeff")).add("Walter");
 
-//
+
 // another example: adding strings to a list with enough space validation
 //
 // (bad design: use a static method for list validation)
 
-list.add("Jeff");                     // the lines are coupled together
+list = MyAddition(new LinkedList());
+list = list.add("Jeff");                     // the lines are coupled together
 Foo.checkIfListStillHasSpace(list);   // one needs to check the body of the methods to refactor the code
-list.add("Walter");
+list = list.add("Walter");
+return list;
 // the lines are coupled, the order is important
 
 // (good design: let the static method takes list as arugemnt and returns the list after the validation)
 
-list.add("Jeff");
-Foo.withEnoughSpace(list).add("Walter");  // the last two lines are combined together
+list = MyAddition(new LinkedList());
+list = list.add("Jeff");
+list = Foo.withEnoughSpace(list).add("Walter");  // the last two lines are combined together
+return list;
 
 // (better design: use decorator class for validation)
 // because static methods are evil, we can replace static methods with composable decorators
 
-list.add("Jeff");
-WithEnoughSpace(list).add("Walter");
+list = MyAddition(new LinkedList());
+list = list.add("Jeff");
+list = WithEnoughSpace(list).add("Walter");
+return list
 // WithEnoughSpace decorates add() method by validating if there is enough space before adding the string
+
+// the above three lines can be consolidated to one line
+return WithEnoughSpace(MyAddition(new LinkedList()).add("Jeff")).add("Walter");
 
 //
 // rule of thumbs:
@@ -137,7 +156,7 @@ WithEnoughSpace(list).add("Walter");
 // (bad design)
 
 Request request = new Request("http://example.com");
-request.method("POST");          // both requests need the POST method setting
+request.method("POST");          // both requests need the POST method setting (mutable object)
 String first = request.fetch();  // making the first request
 request.body("text=hello");      // the second request has the HTTP body
 String second = request.fetch(); // making the second request
@@ -160,7 +179,7 @@ String second = request.method("POST").body("text=hello").fetch();
 // (better design: avoid code duplication)
 
 final Request request = new Request("");
-final Request post = request.method("POST");     // method() returns a new immutable Request object
+final Request post = request.method("POST");     // returns a new immutable Request object
 String first = post.fetch();                     // can safely remove the first request
 String second = post.body("text=hello").fetch(); // body() returns a new immutable Request object
 // immutablity of objects helps avoid temporal coupling

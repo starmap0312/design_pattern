@@ -10,18 +10,21 @@
 //
 // - Form Consistent Abstractions
 // handling different details at different levels
+// class interfaces should provide a consistent abstraction
 //
 // - Encapsulate Implementation Details
 //
 // - Inherit when Inheritance Simplifies the Design
-// define a base class that specifies common elements of multiple derived classes
-//   it makes code reused but create coupling subclasses
-// adhere to the Liskov Substitution Principle (LSP)
-//   do not inherit from a base class unless derived class truly "is a" more specific version of base class
-//   subclasses must be usable through base class interface without user needs to know the difference
-//   ex. base class: Account
-//       derived classes: CheckingAccount, SavingsAccount,
-// the client code should always program to the base class or interface (not thinking about subclass details)
+// 1) define a base class that specifies common elements of multiple derived classes
+//    it makes code reused but create coupling subclasses
+// 2) adhere to the Liskov Substitution Principle (LSP)
+//    do not inherit from a base class unless derived class truly "is a" more specific version of base class
+//    subclasses must be usable through base class interface without user needs to know the difference
+//    ex. base class: Account
+//        derived classes: CheckingAccount, SavingsAccount,
+// 3) the client code should always program to the base class or interface (not thinking about subclass details)
+// 4) containment is preferable to inheritance unless you're modeling an IS_A relationship
+// 5) inheritance is a useful tool, but it adds complexity
 //
 // - Information Hiding
 // 1) good hiding can reduce the amount of code affected by a change
@@ -32,6 +35,7 @@
 //    b) creation of data types: improve code design and readability
 //       ex. create class ID to hide int
 //    c) class design, routine design, and subsystem design
+// 3) class interface should hide something: a system interface, a design decision, or an implementation detail
 //
 // - Identify Areas Likely to Change
 // isolate unstable areas so that the effect of a change will be limited to one routine, class, or package
