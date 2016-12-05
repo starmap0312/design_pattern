@@ -36,6 +36,23 @@ class DefaultReport implements Report { // default implmentation of Report
 }
 
 // a validating class
+class NoNullReport implements Report {
+
+    private final Report origin;
+
+    NoNullReport(Report rep) {
+        this.origin = rep;
+    }
+
+    void export(File file) {
+        if (file == null) {       // validation: file is NULL
+            throw new IllegalArgumentException("File is NULL; can't export.");
+        }
+        this.origin.export(file); // delegates the export to the derocatee
+    }
+}
+
+// a validating class
 class NoWriteOverReport implements Report {
 
     private final Report origin;
@@ -45,7 +62,7 @@ class NoWriteOverReport implements Report {
     }
 
     void export(File file) {
-        if (file.exists()) {      // validation step
+        if (file.exists()) {      // validation: file already exists
             throw new IllegalArgumentException("File already exists.");
         }
         this.origin.export(file); // delegates the export to the derocatee
