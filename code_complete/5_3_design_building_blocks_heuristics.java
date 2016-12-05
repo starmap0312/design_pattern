@@ -68,3 +68,10 @@
 //
 // - Assign Responsibilities
 //   what each object should be responsible for ~= what information it should hide
+//
+// - Identify Areas Likely to Change
+// 1) identify items that seem likely to change
+// 2) separate items that are likely to change
+//    put componenets that likely to change at the same time into its own class
+// 3) isolate items that seem likely to change
+//    design the interclass interfaces to be insensitive to the potential changes
