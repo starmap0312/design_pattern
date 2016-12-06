@@ -1,12 +1,11 @@
 # Command Pattern
-# - issue requests to objects' operations (in the invoker) without knowing about the requested
-#   operation or the receiver object
-# - a command object encapsulates (wraps): 
-#   a) a receiver object
-#   b) the receiver's operation to be invoked
-#   c) the arguments to be passed in
-
-# a simple example
+# - client issue requests to receiver's operations using invoker without knowing about
+#   requested operation or the receiver object (client is decoupled from receivers)
+# - command object encapsulates (wraps) receiver object
+#   a) receiver's operation to be invoked
+#   b) arguments to be passed in
+#
+# example: a simplified version without receiver (command objects do the real tasks directly)
 
 class Command(object):
     ''' a uniform interface '''
@@ -33,8 +32,8 @@ class ProgrammerCommand(Command):
         print 'programmer: sell the bugs'
 
 class Invoker(object):
-    ''' the invoker class: knows how to use command objects but delegates the construction to
-        external code (i.e. the client)
+    ''' the invoker class works like a composite object
+        only knows how to use command objects but delegates the construction to external code (client)
     '''
 
     def __init__(self):
@@ -47,7 +46,7 @@ class Invoker(object):
         for command in self.queue:
             command.execute()
 
-# the client
+# client
 invoker = Invoker()
 invoker.addCommand(EngineerCommand())
 invoker.addCommand(PoliticianCommand())
