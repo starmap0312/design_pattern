@@ -1,17 +1,24 @@
 # Command Pattern (an OK design pattern)
-# object pattern: responsibilites between objects are established at run time via composition
-# behavioral pattern: how classes and objects interact and distribute responsibilites
+# - encapsulate a request (receiver's operation) as an object (no longer method level)
+#   this lets you parameterize clients with different requests, queue requests or log requests, and
+#   support undoable operations
+# - object pattern: responsibilites between objects are established at run time via composition
+#   behavioral pattern: how classes and objects interact and distribute responsibilites
 # - a combination of using adapter, delegation, dependency injection, and dependency inversion
 #   patterns
 # - 4 major roles of command pattern:
 #   a) the receiver object: a service object with operations that actually do the work
 #                           all service objects are adapted to command interface
+#      ex. class Cook: with cook_steak() and cook_pork() methods
 #   b) the command object: knows about how to invokes a receiver's operation (implement a uniform interface)
 #      (i.e. knows about some subset of the following: the receiver object, one of its operation,
 #       and the parameters of the operation)
+#      ex. class Order: with a common execute() method 
 #   c) the invoker object: knows about how to use a command object (with optional bookkeeping)
+#      ex. class Waiter: with execute_orders() method (can queue, log, or undo orders)
 #   d) the client object: constructs and uses the invoker object to run the command objects
 #                         by injecting command objects into the invoker object
+#      ex. class Restaurant: compose Order objects, inject them to Waiter object, then use the Waiter object
 #
 #                        (HAS_A)               (HAS_A)
 #             Client ----------------> Invoker ------> Command
@@ -19,6 +26,79 @@
 #       (HAS_A) |                                  (IS_A) |       (HAS_A)
 #               |--------------------------------> CommandExample ------> Receiver
 #                      constructs & injects                        uses
+#
+# real example:
+#
+#                        (HAS_A)            (HAS_A)
+#           Restaurant ----------> Waiter ----------> Order
+#               |     (constructs & uses)             ^   ^
+#               |                               (IS_A)|   |(IS_A)   (HAS_A)
+#               |---------------------------> SteakOrder  PorkOrder ------> Cook
+#                   (constructs & injects)                          (uses)
+
+class Restaurant(object):
+    ''' client '''
+    def main(self):
+        # receiver object: with methods that do the real tasks
+        cook = Cook()
+
+        # command objects: encapsulate receiver's methods into object with a common interface
+        order1 = SteakOrder(cook)
+        order2 = PorkOrder(cook)
+
+        # invoker: consists of (multiple) command object(s), used by client to execute commands
+        waiter = Waiter().with_order(order1).with_order(order2)
+        waiter.send_orders()
+
+class Cook(object):
+    ''' receiver '''
+
+    def cook_steak(self):      # request/method that does the real task
+        print('cooking steak')
+
+    def cook_pork(self):       # request/method that does the real task
+        print('cooking pork')
+
+class Order(ABC):
+    ''' command interface '''
+
+    @abstractmethod
+    def execute(self):
+        pass
+
+class SteackOrder(Order):
+    ''' command '''
+
+    def __init__(self, cook):
+        self.cook = cook
+
+    def execute(self):
+        self.cook.cook_steak()
+
+class PorkOrder(Order):
+    ''' command '''
+
+    def __init__(self, cook):
+        self.cook = cook
+
+    def execute(self):
+        self.cook.cook_pork()
+
+class Waiter(self):
+    ''' invoker '''
+
+    def __init__(self, orders=None):
+        self.orders = orders
+
+    def with_order(self, order):
+        orders = list(self.orders)
+        orders.append(order)
+        return Order(orders)
+
+    def send_orders(self):
+        for order in self.orders:
+            order.execute()
+
 #
 # - two important features:
 #   a) interface separation (dependency inversion): the invoker is isolated from the receiver
@@ -127,15 +207,15 @@ class Stereo(object):
 
 # the client: constructs receiver objects, adapt them into command interface, and injects the
 # command objects into the invoker, and finally uses the invoker to execute the command objects
-light = Light() # a receiver object
-lightOnCommand = LightOnCommand(light) # a command object: an adapter of the receiver object
-lightOffCommand = LightOffCommand(light) # a command object: an adapter of the receiver object
-stereo = Stereo() # a receiver object
-stereoTurnedCommand = StereoOnCommand(stereo) # a command object: an adapter of the receiver object
-invoker = Invoker() # the invoker that sets up and runs the command objects
-invoker.setCommand(lightOnCommand, 0)
+light = Light()                               # a receiver object
+lightOnCommand = LightOnCommand(light)        # command object: adapter of receiver object's method
+lightOffCommand = LightOffCommand(light)      # command object: adapter of receiver object's method
+stereo = Stereo()                             # another receiver object
+stereoTurnedCommand = StereoOnCommand(stereo) # command object: adapter of receiver object's method
+invoker = Invoker()                           # invoker object: used to executes command objects
+invoker.setCommand(lightOnCommand, 0)         # client constructs invoker and injects command objects to it
 invoker.setCommand(stereoTurnedCommand, 1)
 invoker.setCommand(lightOffCommand, 2)
-invoker.runCommand(0)
+invoker.runCommand(0)                         # client uses invoker to executes command objects
 invoker.runCommand(1)
 invoker.runCommand(2)
