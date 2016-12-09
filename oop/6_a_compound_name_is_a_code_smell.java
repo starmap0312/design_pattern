@@ -1,15 +1,18 @@
 // A Compound Name Is a Code Smell
-//   ex. variable names like textLength, table_name, or current-user-email are bad
-//       use variable names like name, length, or email instead
+//   ex.
+//   (bad design)
+//     textLength, table_name, or current-user-email, etc.
+//   (good design)
+//     name, length, or email, etc.
 //
 // why is it bad?
 //   we give a variable a compound name because its scope is so big and complex that a simple noun
 //     would sound ambiguous
-//   refactor the code into smaller scopes
+//   solution: refactor the code into smaller scopes to resolve the problem, not use compound names
 //
 // example:
 //
-// (bad design: compound variable names)
+// (bad design: compound variable names: csvFileName, redaRecords, csvLine, etc.)
 
 class CSV
 
@@ -24,7 +27,7 @@ class CSV
     end
 end
 
-// (good design: simple variable names)
+// (good design: simple variable names: file, records, line, etc.)
 
 class CSV
 
@@ -38,4 +41,4 @@ class CSV
         end
     end
 end
-// the code looks clear and concise
+// the code looks more clear and concise
