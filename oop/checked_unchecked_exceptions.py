@@ -1,4 +1,4 @@
-# JAVA check exceptions vs. unchecked exceptions
+# JAVA checked exceptions vs. unchecked exceptions
 #
 #   Object -> Throwable -> Error     -> ...
 #                       -> Exception -> RuntimeException
