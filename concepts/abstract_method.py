@@ -19,8 +19,8 @@ class Abstract(ABC):
     def write(self, data):
         pass
 
-# can't instantiate abstract class Abstract with abstract methods read, write: TypeError
-# ex. obj = Abstract()
+# you can't instantiate abstract class Abstract with abstract methods, as TypeError will be raised
+#   ex. obj = Abstract()
 
 class Concrete(Abstract):
 
