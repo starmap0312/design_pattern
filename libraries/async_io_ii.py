@@ -11,6 +11,7 @@ async def factorial(name, number):
     print("Task %s DONE: factorial(%s) = %s" % (name, number, num))
 
 loop = asyncio.get_event_loop()
+# ensure_future(future, *, loop=None): schedule execution of a future (coroutine object)
 tasks = [
     asyncio.ensure_future(factorial("A", 2)),
     asyncio.ensure_future(factorial("B", 4)),

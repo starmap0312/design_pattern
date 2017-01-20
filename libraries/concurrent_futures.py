@@ -5,9 +5,10 @@ from time import sleep
 from random import randint
 import math
 
-# how to create threads & processes for concurrent execution of a function
-# 1) ThreadPoolExecutor: create a thread pool
-# 2) ProcessPoolExecutor: create a process pool 
+# concurrent.futures:
+#   create threads & processes for concurrent execution of a function
+#   1) ThreadPoolExecutor: create a thread pool
+#   2) ProcessPoolExecutor: create a process pool 
 # functions:
 #   future.done():
 #     check if a future instance's task is done
@@ -90,7 +91,7 @@ print("2.2) ProcessPoolExecutor advanced use: CPU intensive tasks, use pool.map(
 
 PRIMES = [ 112272535095293, 112582705942171, 115280095190773, 115797848077099, 1099726899285419 ]
 
-def is_prime(n):
+def is_prime(n): # a CPU intensive task
     if n % 2 == 0:
         return False
  
