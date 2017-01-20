@@ -8,6 +8,15 @@ import math
 # how to create threads & processes for concurrent execution of a function
 # 1) ThreadPoolExecutor: create a thread pool
 # 2) ProcessPoolExecutor: create a process pool 
+# functions:
+#   future.done():
+#     check if a future instance's task is done
+#   pool.submit():
+#     submit a concurrent execution (a future instance is returned)
+#   concurrent.futures.as_completed(futures):
+#     iterate over futures whenever one completes
+#   concurrent.futures.wait(futures, return_when=FIRST_COMPLETED):
+#     wait for the completion of first future instance (default: return_when=ALL_COMPLETED)
 
 # 1.1) 
 print("1.1) ThreadPoolExecutor basic use: future's done() & result()")
@@ -47,7 +56,7 @@ for future in as_completed(futures):
 
 
 # 1.3) 
-print("1.3) ThreadPoolExecutor basic use: future's wait()")
+print("1.3) ThreadPoolExecutor basic use: wait()")
 pool = ThreadPoolExecutor(5)
 futures = [pool.submit(return_after_random_secs, i) for i in range(5)]
 # wait for first future completion
