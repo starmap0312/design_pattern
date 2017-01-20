@@ -9,7 +9,7 @@ import asyncio
 #    ex. pause a coroutine while it waits for an IO (or an HTTP request) and execute another one in the meantime
 # 2) event loop: used to orchestrate the execution of the coroutines
 
-# two ways to define a coroutine in python: effectively equivalent in type
+# two ways to define a coroutine (effectively equivalent in type)
 # 1) use async:
 async def ping_server(ip):
     pass
@@ -40,19 +40,19 @@ def get_json(client, url):
     file_content = yield from load_file('/tmp/filename')
 
 # 2) async/await: (primary syntax)
-# a) await any function call that has been declared async
-# b) "async" is used to define a native coroutine and "await" is used to "yield control" in place of "yeild"
-# c) await is just like yield from, it cannot be used outside of another coroutine
+#    a) await any function call that has been declared async
+#    b) "async" is used to define a native coroutine and "await" is used to "yield control" in place of "yeild"
+#    c) await is just like yield from, it cannot be used outside of another coroutine
 async def ping_local():  
     return await ping_server('192.168.1.1')
 # in the above example, awaits releases the thread of execution which only returns when ping_server() completes
 #   ping_server() must be awaitable, i.e. a coroutine
 
 # event loop: the central execution device that provides
-# a) registering, executing and cancelling delayed calls (timeouts)
-# b) creating client and server transports for various kinds of communication
-# c) launching subprocesses and the associated transports for communication with an external program
-# d) delegating costly function calls to a pool of threads
+#    a) registering, executing and cancelling delayed calls (timeouts)
+#    b) creating client and server transports for various kinds of communication
+#    c) launching subprocesses and the associated transports for communication with an external program
+#    d) delegating costly function calls to a pool of threads
 
 print("event loop")
 async def speak_async():  

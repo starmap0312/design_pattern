@@ -4,27 +4,31 @@ import requests
 from time import sleep
 from random import randint
 import math
- 
+
+# how to create threads & processes for concurrent execution of a function
+# 1) ThreadPoolExecutor: create a thread pool
+# 2) ProcessPoolExecutor: create a process pool 
+
+# 1.1) 
+print("1.1) ThreadPoolExecutor basic use: future's done() & result()")
+
 def return_after_3_secs(message):
     sleep(3)
     return message
 
-# basic use:
-print("1) ThreadPoolExecutor basic use: done() & result()")
-
 pool = ThreadPoolExecutor(3)
  
+# submit one concurrent execution: a thread from the pool will pick up the task
 future = pool.submit(return_after_3_secs, ("message"))
-if future.done():
+if future.done(): # this condition will not be valid
     print("Print result if done (<3 secs): {}".format(future.result()))
 sleep(4)
-if future.done():
+if future.done(): # this condition will be valid
     print("Print result if done (>3 secs): {}".format(future.result()))
 
-# as_completed: takes an iterable of Future objects and starts yielding values as soon as the
-#               futures start resolving
-# map: returns the results in the order in which we pass the iterables
-print("2) ThreadPoolExecutor basic use: as_completed()")
+
+# 1.2) 
+print("1.2) ThreadPoolExecutor basic use: future's as_completed()")
  
 def return_after_random_secs(task_id):
     sleep_time = randint(1, 3)
@@ -32,30 +36,37 @@ def return_after_random_secs(task_id):
     return "Task {}: random sleep {} seconds".format(task_id, sleep_time)
  
 pool = ThreadPoolExecutor(5)
+
+# submit 5 concurrent executions: 5 threads from the pool will pick up the task
 futures = [pool.submit(return_after_random_secs, i) for i in range(5)]
  
+# as_completed: takes an iterable of Future objects and starts yielding values as soon as futures start resolving
+#               it returns the results in the order of completion 
 for future in as_completed(futures):
     print('Random sleep task: {} secs'.format(future.result()))
 
-print("2) ThreadPoolExecutor basic use: wait()")
+
+# 1.3) 
+print("1.3) ThreadPoolExecutor basic use: future's wait()")
 pool = ThreadPoolExecutor(5)
 futures = [pool.submit(return_after_random_secs, i) for i in range(5)]
-# by default, the wait function returns only when all futures complete (return_when=ALL_COMPLETED)
+# wait for first future completion
 print(wait(futures, return_when=FIRST_COMPLETED))
+# default: wait for all futures complete (i.e. return_when=ALL_COMPLETED)
 
-# advanced use: as_completed
-print("3) ThreadPoolExecutor advanced use: network operations or I/O-bound tasks")
 
-URLS = ['http://www.foxnews.com/',
-        'http://www.cnn.com/',
-        'http://www.bbc.com/']
+# 1.4) 
+print("1.4) ThreadPoolExecutor advanced use: network operations or I/O-bound tasks, ex. requests.get")
 
-with ThreadPoolExecutor(max_workers=5) as pool:
-    futures = [ pool.submit(requests.get, url) for url in URLS]
+URLS = ['http://www.foxnews.com/', 'http://www.cnn.com/', 'http://www.bbc.com/']
+
+with ThreadPoolExecutor(max_workers=5) as pool:                 # create a thread pool of size 5
+    futures = [ pool.submit(requests.get, url) for url in URLS] # submit 3 concurrent executions
     for future in as_completed(futures):
         print("status code: {}".format(future.result().status_code))
 
-print("4) ProcessPoolExecutor basic use: done() & result()")
+# 2.1) 
+print("2.1) ProcessPoolExecutor basic use: done() & result()")
 pool = ProcessPoolExecutor(3)
 
 future = pool.submit(return_after_3_secs, ("message"))
@@ -65,14 +76,10 @@ sleep(4)
 if future.done():
     print("Print result if done (>3 secs): {}".format(future.result()))
 
-print("5) ProcessPoolExecutor advanced use: CPU intensive tasks")
+# 2.2) 
+print("2.2) ProcessPoolExecutor advanced use: CPU intensive tasks, use pool.map()")
 
-PRIMES = [
-    112272535095293,
-    112582705942171,
-    115280095190773,
-    115797848077099,
-    1099726899285419]
+PRIMES = [ 112272535095293, 112582705942171, 115280095190773, 115797848077099, 1099726899285419 ]
 
 def is_prime(n):
     if n % 2 == 0:
@@ -85,6 +92,7 @@ def is_prime(n):
     return True
  
 with ProcessPoolExecutor() as pool:
+    # map: returns the results in the order in which we pass the iterables
     for number, prime in zip(PRIMES, pool.map(is_prime, PRIMES)):
         print('{} is prime: {}'.format(number, prime))
 
